@@ -1,0 +1,227 @@
+@media (min-width: 992px) {
+    .section-collection {
+    }
+}
+.section-collection {
+    padding-bottom: 16px;
+}
+article, aside, details, figcaption, figure, dialog, footer, header, hgroup, menu, nav, section {
+    display: block;
+}
+
+.container-fluid {
+    max-width: 1220px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 10px;
+}
+.container-fluid, .container-lg, .container-md, .container-sm, .container-xl {
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+.section .wrapper-content {
+    background: #fff;
+    border-radius: 4px;
+}
+.section-collection .section-heading {
+    padding: 12px 28px 12px 24px;
+    margin-bottom: 0;
+}
+.section-heading {
+    padding: 12px 24px;
+    position: relative;
+    display: flex;
+    display: -ms-flex;
+    display: -webkit-flex;
+    flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    -webkit-flex-wrap: wrap;
+    justify-content: space-between;
+    -ms-justify-content: space-between;
+    -webkit-justify-content: space-between;
+    align-items: center;
+    -ms-align-items: center;
+}
+.section-heading .box-left, .section-heading .box-right {
+    display: flex;
+    display: -ms-flex;
+    display: -webkit-flex;
+    align-items: center;
+    -ms-align-items: center;
+}
+@media (max-width: 1170px) {
+    .section-heading .hTitle {
+        font-size: 22px;
+    }
+}
+.section-heading .hTitle {
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 36px;
+    color: var(--titlecolor);
+    margin-bottom: 0;
+    white-space: initial;
+    overflow: hidden;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+}
+@media (max-width: 1170px) {
+    .section-heading .shTitle, .section-heading .box-link a, .section-heading .box-cate .cate-list li a {
+        font-size: 14px;
+    }
+}
+.section-heading .shTitle {
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 22px;
+    padding-left: 21px;
+    margin: 0 0 0 20px;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+.section-heading .shTitle svg {
+    margin-right: 9px;
+    width: 22px;
+    height: 14px;
+}
+
+svg {
+    overflow: hidden;
+    vertical-align: middle;
+}
+.section-heading .box-right {
+    justify-content: flex-end;
+    -ms-justify-content: flex-end;
+    -webkit-justify-content: flex-end;
+}
+.section-heading .box-left, .section-heading .box-right {
+    display: flex;
+    display: -ms-flex;
+    display: -webkit-flex;
+    align-items: center;
+    -ms-align-items: center;
+}
+.section-heading .box-cate .cate-list {
+    display: flex;
+    display: -ms-flex;
+    display: -webkit-flex;
+    justify-content: flex-end;
+    -ms-justify-content: flex-end;
+    -webkit-justify-content: flex-end;
+}
+
+@media (max-width: 1170px) {
+    .section-heading .shTitle, .section-heading .box-link a, .section-heading .box-cate .cate-list li a {
+        font-size: 14px;
+    }
+}
+.section-heading .box-cate .cate-list li a {
+    position: relative;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+    color: #333333;
+    padding: 5px 16px;
+    white-space: nowrap;
+}
+.section-heading .box-link {
+    margin-left: 20px;
+}
+@media (max-width: 1170px) {
+    .section-heading .shTitle, .section-heading .box-link a, .section-heading .box-cate .cate-list li a {
+        font-size: 14px;
+    }
+}
+.section-heading .box-link a {
+    display: flex;
+    align-items: center;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+    color: #1982F9;
+}
+
+.section-collection .section-content {
+    padding: 8px 6px 0;
+}
+
+@media (max-width: 1170px) and (min-width: 992px) {
+    .proloop-technical {
+        font-size: 10px;
+    }
+}
+ .proloop-technical {
+    background: #ECECEC;
+    border-radius: 4px;
+    color: #6D6E72;
+    font-size: 12px;
+    padding: 4px 8px;
+    margin-bottom: 8px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+ .proloop-technical .proloop-technical--line[data-tag="cpu"] {
+    order: 1;
+}
+ .proloop-technical .proloop-technical--line {
+    display: inline-flex;
+    align-items: center;
+    padding-bottom: 2px;
+    margin-right: 10px;
+}
+ .proloop-technical .proloop-technical--line > svg {
+    width: 10px;
+    height: 10px;
+    margin-right: 5px;
+}
+ .proloop-technical .proloop-technical--line[data-tag="ram"] {
+    order: 4;
+}
+ .proloop-technical .proloop-technical--line {
+    display: inline-flex;
+    align-items: center;
+    padding-bottom: 2px;
+    margin-right: 10px;
+}
+ .proloop-technical .proloop-technical--line[data-tag="vga"] {
+    order: 2;
+}
+ .proloop-technical .proloop-technical--line {
+    display: inline-flex;
+    align-items: center;
+    padding-bottom: 2px;
+    margin-right: 10px;
+}
+ .proloop-technical .proloop-technical--line[data-tag="ssd"] {
+    order: 5;
+}
+ .proloop-technical .proloop-technical--line {
+    display: inline-flex;
+    align-items: center;
+    padding-bottom: 2px;
+    margin-right: 10px;
+}
+ .proloop-technical .proloop-technical--line[data-tag="hz"] {
+    order: 7;
+}
+ .proloop-technical .proloop-technical--line {
+    display: inline-flex;
+    align-items: center;
+    padding-bottom: 2px;
+    margin-right: 10px;
+}
+ .proloop-technical .proloop-technical--line[data-tag="lcd"] {
+    order: 6;
+}
+ .proloop-technical .proloop-technical--line {
+    display: inline-flex;
+    align-items: center;
+    padding-bottom: 2px;
+    margin-right: 10px;
+}
