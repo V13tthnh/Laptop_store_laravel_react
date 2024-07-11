@@ -3,6 +3,7 @@ import ModalEditAddress from "./ModalEditAddress";
 import { deleteAddress, setDefaultAddress } from "../../api/address";
 import { useState } from "react";
 import useAuthContext from "../../context/AuthContext";
+import { ToastContainer } from "react-toastify";
 
 export default function AddressRow({data, onReload, deleteReload}) {
   const [errors, setErrors] = useState("");
@@ -36,6 +37,18 @@ export default function AddressRow({data, onReload, deleteReload}) {
 
   return (
     <>
+    <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <div className="address_wrap">
         <div className="colright view_address">
           <div className="line">

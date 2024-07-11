@@ -1,8 +1,6 @@
 import Carousel from "react-multi-carousel";
-import "react-multi-carousel/lib/styles.css";
-import SingleProduct from "./SingleProduct";
-import { useEffect, useState } from "react";
-import api from "../../api/api";
+import { useSelector } from "react-redux";
+import SingleProduct from "../layout/SingleProduct";
 
 const responsive = {
   largeDesktop: {
@@ -11,7 +9,7 @@ const responsive = {
   },
   desktop: {
     breakpoint: { max: 3000, min: 1024 },
-    items: 5,
+    items: 4,
   },
   tablet: {
     breakpoint: { max: 1024, min: 464 },
@@ -23,23 +21,12 @@ const responsive = {
   },
 };
 
-export default function BestSeller() {
-  const [products, setProducts] = useState([]);
-
-  useEffect(() => {
-    api
-      .get("/laptops")
-      .then((res) => {
-        if (res.data.status) {
-          setProducts(res.data.data);
-        }
-      })
-      .catch((error) => console.log(error));
-  }, []);
-
+export default function ViewedProduct(props) {
+  const viewedProducts = useSelector((state) => state.viewed.items);
+  console.log(viewedProducts);
   return (
     <>
-      {products && (
+      {viewedProducts && (
         <section
           className="best-seller container"
           style={{
@@ -58,7 +45,7 @@ export default function BestSeller() {
                     style={{ marginLeft: "17px" }}
                   >
                     <span>
-                      <h4>Sản phẩm bán chạy</h4>
+                      <h4>Sản phẩm đã xem</h4>
                     </span>
                   </div>
                 </div>
@@ -94,7 +81,7 @@ export default function BestSeller() {
                               dotListClass="custom-dot-list-style"
                               itemClass="carousel-item-padding-40-px"
                             >
-                              {products.map((item) => {
+                              {viewedProducts.map((item) => {
                                 return (
                                   <>
                                     <SingleProduct data={item} />

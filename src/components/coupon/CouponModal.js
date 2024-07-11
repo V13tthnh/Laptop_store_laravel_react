@@ -8,28 +8,36 @@ import {
   Box,
 } from "@mui/material";
 import "./CouponModal.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CouponItem from "./CouponItem";
 import useAuthContext from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { getAvailableCoupons } from "../../api/coupon";
+import { getAvailableCoupons, getApplyCoupon } from "../../api/coupon";
+import { useDispatch, useSelector } from "react-redux";
+import { applyCoupon } from "../../redux/slices/CouponSlice";
 
-export default function CouponModal({total}) {
+export default function CouponModal({ total }) {
   const { token, user } = useAuthContext();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
   const [coupons, setCoupons] = useState([]);
+  const [errors, setErrors] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState("");
-  const [discount, setDiscount] = useState(null);
-  const [couponCode, setCouponCode] = useState("");
-  const [minimumSpend, setMinimumSpend] = useState(0);
+  const [applyCode, setApplyCode] = useState(null);
+  const cartItems = useSelector((state) => state.cart.items);
+  const coupon = useSelector((state) => state.coupon.items);
+
+  const handleApplyCodeChange = (e) => {
+    setApplyCode(e.target.value);
+  };
 
   useEffect(() => {
     fetchAvailableCoupons();
-  }, []);
+    calculateTotal(cartItems);
+  }, [cartItems]);
 
   const handleClickOpen = () => {
     if (!token || !user) {
@@ -40,13 +48,32 @@ export default function CouponModal({total}) {
     setOpen(true);
   };
 
+  const calculateTotal = (cart) => {
+    return cart.reduce((total, product) => {
+      return total + parseToNumber(product.unit_price) * product.quantity;
+    }, 0);
+  };
+
+  const parseToNumber = (num) => {
+    if (typeof num === "number") {
+      return num;
+    }
+    if (typeof num === "string") {
+      const numberStr = num.replace(/\./g, "").replace(" vnđ", "");
+      const number = parseFloat(numberStr);
+      return number;
+    }
+    return NaN;
+  };
+
   const handleClose = () => {
+    setApplyCode("");
     setOpen(false);
   };
 
   const fetchAvailableCoupons = async () => {
     try {
-      const data = await getAvailableCoupons({total: total});
+      const data = await getAvailableCoupons({ total: total });
       setCoupons(data.data);
     } catch (error) {
       console.error("Failed to load addresses:", error);
@@ -55,24 +82,30 @@ export default function CouponModal({total}) {
     }
   };
 
-  const handleCheckCoupon = async () => {
-    // try {
-    //   const response = await api.post("/check-coupon", {
-    //     code: couponCode,
-    //     minimum_spend: minimumSpend,
-    //   });
-    //   const data = await response.json();
+  const handleApplyCoupon = async () => {
+    try {
+      const response = await getApplyCoupon({ code: applyCode });
 
-    //   if (data.success) {
-    //     setMessage(data.message);
-    //     setDiscount(data.discount);
-    //   } else {
-    //     setMessage(data.message);
-    //     setDiscount(null);
-    //   }
-    // } catch (error) {
-    //   console.error("Error:", error);
-    // }
+      dispatch(
+        applyCoupon({
+          code: response.data.code,
+          value: response.data.value,
+          description: response.data.description,
+          minimum_spend: response.data.minimum_spend,
+          end_date: response.data.end_date,
+          type: response.data.type,
+        })
+      );
+      toast.success("Đã áp dụng mã giảm giá.");
+      handleClose();
+      setApplyCode("");
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        setErrors(error.response.data.errors);
+      } else {
+        setErrors({ submit: "Failed to add address" });
+      }
+    }
   };
 
   return (
@@ -108,11 +141,10 @@ export default function CouponModal({total}) {
                             label="Nhập mã giảm giá"
                             maxRows={12}
                             size="small"
+                            value={applyCode}
+                            onChange={handleApplyCodeChange}
                           />
                         </div>
-                        {/* {errors.code && (
-                            <p style={{ color: "red" }}>{errors.code}</p>
-                          )} */}
                       </Box>
                     </div>
                     <button
@@ -121,10 +153,9 @@ export default function CouponModal({total}) {
                       type="button"
                       id="apply-coupon-btn"
                       style={{ marginTop: "9px" }}
+                      onClick={handleApplyCoupon}
                     >
-                      <div type="body">
-                        Áp dụng
-                      </div>
+                      <div type="body">Áp dụng</div>
                       <span style={{ marginLeft: "0px" }}>
                         <div className="css-157jl91"></div>
                       </span>
@@ -136,7 +167,9 @@ export default function CouponModal({total}) {
                     </div>
                     {coupons &&
                       coupons.map((item) => {
-                        return <CouponItem data={item} />;
+                        return (
+                          <CouponItem data={item} closeModal={handleClose} />
+                        );
                       })}
                     <div className="css-apomyl"></div>
                   </div>

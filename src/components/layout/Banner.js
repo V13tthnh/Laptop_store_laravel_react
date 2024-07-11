@@ -5,6 +5,7 @@ import { getBanners } from "../../api/banner";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { NavLink } from "react-router-dom";
+import { Suspense } from "react";
 
 const responsive = {
   largeDesktop: {
@@ -47,50 +48,49 @@ export default function Banner() {
 
   return (
     <>
-      <section className="slider">
+      <section className="slider" style={{ marginLeft: "320px" }}>
         <div className="container">
           <div className="row">
             <div className="col-lg-12 col-md-12">
               <div className="slider-area">
                 <div className="slider-active">
-                  {banners && (
-                    <Carousel
-                      draggable={false}
-                      showDots={false}
-                      responsive={responsive}
-                      ssr={true}
-                      infinite={true}
-                      autoPlaySpeed={2000}
-                      keyBoardControl={true}
-                      customTransition="all .5"
-                      transitionDuration={500}
-                      containerClassName="carousel-container"
-                      removeArrowOnDeviceType={["tablet", "mobile"]}
-                      deviceType={"desktop"}
-                      itemClassName="carousel-item-padding-10-px"
-                    >
-                      {banners.map((item) => {
-                        return (
-                          <NavLink to="">
-                            <div className="single-slide align-center-left animation-style-01 bg-1">
-                              <img
-                                src={`http://localhost:8000/${item.image_url}`}
-                                style={{ height: "500px", width: "100%" }}
-                                alt=""
-                              />
-                              <div className="slider-progress"></div>
-                            </div>
-                          </NavLink>
-                        );
-                      })}
-                    </Carousel>
-                  )}
+                    {banners && (
+                      <Carousel
+                        draggable={false}
+                        showDots={false}
+                        responsive={responsive}
+                        ssr={true}
+                        infinite={true}
+                        autoPlaySpeed={2000}
+                        keyBoardControl={true}
+                        customTransition="all .5"
+                        transitionDuration={500}
+                        containerClassName="carousel-container"
+                        removeArrowOnDeviceType={["tablet", "mobile"]}
+                        deviceType={"desktop"}
+                        itemClassName="carousel-item-padding-10-px"
+                      >
+                        {banners.map((item) => {
+                          return (
+                            <NavLink to={`/laptop/${item.link}`}>
+                              <div className="single-slide align-center-left animation-style-01 bg-1">
+                                <img
+                                  src={`http://localhost:8000/${item.image_url}`}
+                                  style={{ height: "500px", width: "100%" }}
+                                  alt=""
+                                />
+                              </div>
+                            </NavLink>
+                          );
+                        })}
+                      </Carousel>
+                    )}
                 </div>
               </div>
             </div>
-            <div className="quick-link">
+            {/* <div className="quick-link">
               <QuickLink />
-            </div>
+            </div> */}
           </div>
         </div>
       </section>

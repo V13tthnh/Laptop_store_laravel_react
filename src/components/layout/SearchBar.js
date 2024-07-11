@@ -3,6 +3,15 @@ import useDebounce from "../../hooks/debounce";
 import axios from "axios";
 import { NavLink, useNavigate } from "react-router-dom";
 import api from "../../api/api";
+import Box from "@mui/material/Box";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Divider from "@mui/material/Divider";
+import ProductDropdown from "../common/ProductDropdown";
+import { toast } from "react-toastify";
 
 export default function Searchbar() {
   const [loading, setLoading] = useState();
@@ -10,13 +19,13 @@ export default function Searchbar() {
   const [searchValue, setSearchValue] = useState([]);
   const navigate = useNavigate();
 
-  const debouncedSearch = useDebounce(search, 2000);
+  const debouncedSearch = useDebounce(search, 1500);
 
   useEffect(() => {
     if (debouncedSearch) {
       setLoading(true);
       api
-        .get(`/laptop/search?search=${debouncedSearch}`)
+        .get(`/laptop/search/${debouncedSearch}`)
         .then((res) => setSearchValue(res.data.data))
         .catch((error) => {
           console.log(error);
@@ -25,42 +34,30 @@ export default function Searchbar() {
     }
   }, [debouncedSearch]);
 
-  const reloadPage = (slug) => {
-    navigate(`/laptop/${slug}`);
-    window.location.reload(false);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if(!search){
+      toast.error("Vui lòng nhập dữ liệu tìm kiếm.");
+      return;
+    }
+    navigate(`/laptop?search=${search}`);
   };
 
   return (
-    <form action="#" className="hm-searchbox">
-      <select className="nice-select select-search-category">
-        <option value="0"> Danh mục sản phẩm</option>
-        <option>Gaming</option>
-        <option>Học tập, văn phòng</option>
-        <option>Đồ họa, kỹ thuật</option>
-        <option>Mỏng nhẹ</option>
-        <option>AI</option>
-        <option>Cao cấp, sang trọng</option>
-      </select>
-      <input type="text" placeholder="Bạn cần tìm gì?"  onChange={(e) => setSearch(e.target.value)}/>
-      {search &&
-        searchValue?.map((item) => (
-          <div className="row">
-            <div className="col-md-3">
-              <img
-                src={`http://localhost:8000/` + item?.images[0]?.url}
-                style={{ width: "70px", height: "60px" }}
-              />
-            </div>
-            <div className="col-md-8">
-              <NavLink onClick={() => reloadPage(item.id)}>
-                <h6 style={{ textAlign: "left" }}>{item.name}</h6>
-              </NavLink>
-            </div>
-          </div>
-        ))}
-      <button className="li-btn" type="submit">
-        <i className="fa fa-search"></i>
-      </button>
-    </form>
+    <>
+     <div className="search-container">
+      <form action="#" className="hm-searchbox" onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Bạn cần tìm gì?"
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <button className="li-btn" type="submit">
+          <i className="fa fa-search"></i>
+        </button>
+      </form>
+      <ProductDropdown products={searchValue} show={search ? true : false} />
+    </div>
+    </>
   );
 }

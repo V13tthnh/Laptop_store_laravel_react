@@ -1,44 +1,46 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import useAuthContext from "../../context/AuthContext";
 import api from "../../api/api";
 import { useLocation, useNavigate } from "react-router-dom";
 import LoadingPage from "../../components/common/LoadingPage";
 import { toast } from "react-toastify";
+import axios from "axios";
 
 export default function GoogleCallback() {
-  const { callback, user, errors, getUser } = useAuthContext();
-  const [googleToken, setGoogleToken] = useState(null);
+  const { handleSetToken } = useAuthContext();
   const [loading, setLoading] = useState(false);
   const location = useLocation();
-  const navigator = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         if (location.search) {
-          // setLoading(true);
-          // const response = await api.get(
-          //   `/auth/callback/google${location.search}`
-          // );
-          // getUser(response.data.token);
-          // console.log(response);
-          // setLoading(false);
+          setLoading(true);
+          const response = await axios.get(
+            `http://localhost:8000/api/auth/callback/google${location.search}`,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+              },
+            }
+          );
+          const { token } = response.data;
+          localStorage.setItem("token", token);
+          handleSetToken(token);
+          navigate("/");
         }
-      } catch (e) {
-        console.log(e);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
       }
-      
     };
     fetchData();
-  }, [errors, callback, location.search]);
+  }, [handleSetToken, location.search, navigate]);
 
   if (loading) {
     return <LoadingPage />;
-  }
-
-  if (user) {
-    navigator("/");
-    toast.success("Đăng nhập thành công");
   }
 }

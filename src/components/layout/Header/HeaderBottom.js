@@ -12,7 +12,7 @@ export default function HeaderBottom() {
   const [categoryData, setCategoryData] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(()=>{
+  useEffect(() => {
     handleGetCategories();
   }, []);
 
@@ -40,227 +40,74 @@ export default function HeaderBottom() {
                       </NavLink>
                     </li>
                     <li className="megamenu-holder">
-                      <NavLink to="/product">
+                      <NavLink to="/laptop">
                         <FontAwesomeIcon icon={faLaptop} size="lg" /> Laptop
                       </NavLink>
                       <ul className="megamenu hb-megamenu">
-                        <li>
-                          <NavLink to="/product">Thương hiệu</NavLink>
-                          <ul>
-                            <li>
-                              <a href="shop-3-column.html">Shop 3 Column</a>
-                            </li>
-                            <li>
-                              <a href="shop-4-column.html">Shop 4 Column</a>
-                            </li>
-                            <li>
-                              <a href="shop-left-sidebar.html">
-                                Shop Left Sidebar
-                              </a>
-                            </li>
-                            <li>
-                              <a href="shop-right-sidebar.html">
-                                Shop Right Sidebar
-                              </a>
-                            </li>
-                            <li>
-                              <a href="shop-list.html">Shop List</a>
-                            </li>
-                            <li>
-                              <a href="shop-list-left-sidebar.html">
-                                Shop List Left Sidebar
-                              </a>
-                            </li>
-                            <li>
-                              <a href="shop-list-right-sidebar.html">
-                                Shop List Right Sidebar
-                              </a>
-                            </li>
-                          </ul>
-                        </li>
-                        <li>
-                          <a href="single-product-gallery-left.html">
-                            Nhu cầu
-                          </a>
-                          <ul>
-                            <li>
-                              <a href="single-product-carousel.html">
-                                Single Product Carousel
-                              </a>
-                            </li>
-                            <li>
-                              <a href="single-product-gallery-left.html">
-                                Single Product Gallery Left
-                              </a>
-                            </li>
-                            <li>
-                              <a href="single-product-gallery-right.html">
-                                Single Product Gallery Right
-                              </a>
-                            </li>
-                            <li>
-                              <a href="single-product-tab-style-top.html">
-                                Single Product Tab Style Top
-                              </a>
-                            </li>
-                            <li>
-                              <a href="single-product-tab-style-left.html">
-                                Single Product Tab Style Left
-                              </a>
-                            </li>
-                            <li>
-                              <a href="single-product-tab-style-right.html">
-                                Single Product Tab Style Right
-                              </a>
-                            </li>
-                          </ul>
-                        </li>
-                        <li>
-                          <a href="single-product.html">Cấu hình</a>
-                          <ul>
-                            <li>
-                              <a href="single-product.html">Single Product</a>
-                            </li>
-                            <li>
-                              <a href="single-product-sale.html">
-                                Single Product Sale
-                              </a>
-                            </li>
-                            <li>
-                              <a href="single-product-group.html">
-                                Single Product Group
-                              </a>
-                            </li>
-                            <li>
-                              <a href="single-product-normal.html">
-                                Single Product Normal
-                              </a>
-                            </li>
-                            <li>
-                              <a href="single-product-affiliate.html">
-                                Single Product Affiliate
-                              </a>
-                            </li>
-                          </ul>
-                        </li>
+                        {categoryData &&
+                          categoryData.map((item) => {
+                            return (
+                              <>
+                                <li>
+                                  <p>
+                                    <b>{item.name}</b>
+                                  </p>
+                                  <ul>
+                                    {item.children.map((item) => {
+                                      return (
+                                        <>
+                                         <li>
+                                            <NavLink to={`/laptop?categoryId=${item.id}`}>
+                                              {item.name}
+                                            </NavLink>
+                                          </li>
+                                        </>
+                                      );
+                                    })}
+                                  </ul>
+                                </li>
+                              </>
+                            );
+                          })}
                       </ul>
                     </li>
                     <li className="megamenu-holder">
-                      <NavLink to="/product">
+                      <NavLink to="/laptop">
                         <FontAwesomeIcon icon={faGamepad} size="lg" /> Laptop
                         Gaming
                       </NavLink>
                       <ul className="megamenu hb-megamenu">
-                        <li>
-                          <a href="shop-left-sidebar.html">Shop Page Layout</a>
-                          <ul>
-                            <li>
-                              <a href="shop-3-column.html">Shop 3 Column</a>
-                            </li>
-                            <li>
-                              <a href="shop-4-column.html">Shop 4 Column</a>
-                            </li>
-                            <li>
-                              <a href="shop-left-sidebar.html">
-                                Shop Left Sidebar
-                              </a>
-                            </li>
-                            <li>
-                              <a href="shop-right-sidebar.html">
-                                Shop Right Sidebar
-                              </a>
-                            </li>
-                            <li>
-                              <a href="shop-list.html">Shop List</a>
-                            </li>
-                            <li>
-                              <a href="shop-list-left-sidebar.html">
-                                Shop List Left Sidebar
-                              </a>
-                            </li>
-                            <li>
-                              <a href="shop-list-right-sidebar.html">
-                                Shop List Right Sidebar
-                              </a>
-                            </li>
-                          </ul>
-                        </li>
-                        <li>
-                          <a href="single-product-gallery-left.html">
-                            Single Product Style
-                          </a>
-                          <ul>
-                            <li>
-                              <a href="single-product-carousel.html">
-                                Single Product Carousel
-                              </a>
-                            </li>
-                            <li>
-                              <a href="single-product-gallery-left.html">
-                                Single Product Gallery Left
-                              </a>
-                            </li>
-                            <li>
-                              <a href="single-product-gallery-right.html">
-                                Single Product Gallery Right
-                              </a>
-                            </li>
-                            <li>
-                              <a href="single-product-tab-style-top.html">
-                                Single Product Tab Style Top
-                              </a>
-                            </li>
-                            <li>
-                              <a href="single-product-tab-style-left.html">
-                                Single Product Tab Style Left
-                              </a>
-                            </li>
-                            <li>
-                              <a href="single-product-tab-style-right.html">
-                                Single Product Tab Style Right
-                              </a>
-                            </li>
-                          </ul>
-                        </li>
-                        <li>
-                          <a href="single-product.html">Single Products</a>
-                          <ul>
-                            <li>
-                              <a href="single-product.html">Single Product</a>
-                            </li>
-                            <li>
-                              <a href="single-product-sale.html">
-                                Single Product Sale
-                              </a>
-                            </li>
-                            <li>
-                              <a href="single-product-group.html">
-                                Single Product Group
-                              </a>
-                            </li>
-                            <li>
-                              <a href="single-product-normal.html">
-                                Single Product Normal
-                              </a>
-                            </li>
-                            <li>
-                              <a href="single-product-affiliate.html">
-                                Single Product Affiliate
-                              </a>
-                            </li>
-                          </ul>
-                        </li>
+                        {categoryData &&
+                          categoryData.map((item) => {
+                            return (
+                              <>
+                                <li>
+                                  <p>
+                                    <b>{item.name}</b>
+                                  </p>
+                                  <ul>
+                                    {item.children.map((item) => {
+                                      return (
+                                        <>
+                                          <li>
+                                            <NavLink to={`/laptop?categoryId=${item.id}`}>
+                                              {item.name}
+                                            </NavLink>
+                                          </li>
+                                        </>
+                                      );
+                                    })}
+                                  </ul>
+                                </li>
+                              </>
+                            );
+                          })}
                       </ul>
-                    </li>
-                    <li>
-                      <a href="shop-left-sidebar.html">
-                        <FontAwesomeIcon icon={faTicket} size="lg" />
-                        Khuyến mãi
-                      </a>
                     </li>
                     {/* <li>
                       <a href="shop-left-sidebar.html">
-                        <FontAwesomeIcon icon={faHeadset} size="lg" /> Hỗ trợ
+                        <FontAwesomeIcon icon={faTicket} size="lg" />
+                        Khuyến mãi
                       </a>
                     </li> */}
                   </ul>

@@ -17,12 +17,13 @@ import "react-toastify/dist/ReactToastify.css";
 import { useDispatch, useSelector } from "react-redux";
 import Modal from "../common/Modal";
 import { addToWishList } from "../../redux/slices/WishListSlice";
-import { clearViewed } from "../../redux/slices/ViewedSlice";
+import { addViewed, clearViewed } from "../../redux/slices/ViewedSlice";
 
 export default function ProductDetail(props) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [slideIndex, setSlideIndex] = useState(1);
   const dispatch = useDispatch();
+  const viewed = useSelector((state) => state.viewed.items);
 
   const [width, setWidth] = useState(0);
   const [start, setStart] = useState(0);
@@ -30,6 +31,16 @@ export default function ProductDetail(props) {
 
   const slideRef = useRef();
   const [quantity, setQuantity] = useState(1);
+ 
+  useEffect(() => {
+    dispatch(
+      addViewed(props.productDetail)
+    );
+  }, [dispatch]);
+
+  const handleClearViewed = () => {
+    dispatch(clearViewed());
+  }
 
   const successNotify = (message) => {
     toast.success(message, {
@@ -53,7 +64,8 @@ export default function ProductDetail(props) {
         name: product.name,
         slug: product.slug,
         image: `http://localhost:8000/${product.images[0]?.url}`,
-        product_specification_detail: props.productDetail?.product_specification_details,
+        product_specification_detail:
+          props.productDetail?.product_specification_details,
         quantity: quantity,
         unit_price: product.unit_price,
         sale_price: product.sale_price,
@@ -71,6 +83,8 @@ export default function ProductDetail(props) {
         slug: product.slug,
         image: `http://localhost:8000/${product.images[0]?.url}`,
         quantity: quantity,
+        product_specification_detail:
+        props.productDetail?.product_specification_details,
         unit_price: product.unit_price,
         sale_price: product.sale_price,
         availableQuantity: product.quantity,
@@ -157,6 +171,18 @@ export default function ProductDetail(props) {
 
   return (
     <>
+     <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      /> 
       <BreadCrumb
         categories={props.productDetail?.category}
         productName={props.productDetail?.name}
@@ -192,7 +218,6 @@ export default function ProductDetail(props) {
                         </>
                       );
                     })}
-
                     <a
                       href="#"
                       className="prev-btn"
@@ -321,7 +346,7 @@ export default function ProductDetail(props) {
                             props.productDetail
                               ?.product_specification_details[18]?.value
                           }
-                        </span>{" "}
+                        </span>
                       </div>
                     </li>
                     <li data-index="0" data-prop="0">
@@ -383,18 +408,13 @@ export default function ProductDetail(props) {
                   <div className="rating-box pt-20 pb-10">
                     <div className="rating-box">
                       <span style={{ fontWeight: "500", color: "#FDD835" }}>
-                        {props.productDetail?.overrate}{" "}
+                        {props.productDetail?.overrate}
                       </span>
                       <FontAwesomeIcon icon={faStar} color="#FDD835" />
                       <small style={{ color: "#6D6E72" }}>(0 đánh giá)</small>
-                      <span className="review-item">
-                        <a style={{ color: "#007bff" }} href="#">
-                          Đánh giá
-                        </a>
-                      </span>
                     </div>
                   </div>
-                  <Compare />
+                  <Compare data={props.productDetail}/>
                   <div className="price-box pt-20">
                     <span className="new-price new-price-2">
                       {props.productDetail?.sale_price

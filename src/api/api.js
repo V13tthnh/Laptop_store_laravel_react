@@ -4,11 +4,10 @@ axios.defaults.withCredentials = true;
 
 const api = axios.create({
   baseURL: "http://localhost:8000/api",
-  withCredentials: true,
   headers: {
-    common: {
-      Accept: "application/json",
-    },
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
   },
 });
 

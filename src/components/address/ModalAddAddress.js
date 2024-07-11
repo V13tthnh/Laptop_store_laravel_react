@@ -150,7 +150,18 @@ export default function ModalAddAddress({ onAddSuccess }) {
 
   return (
     <>
-      <ToastContainer />
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <Button onClick={handleClickOpen} className="button add-new-address">
         + Thêm địa chỉ mới
       </Button>

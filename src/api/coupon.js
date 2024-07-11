@@ -19,3 +19,13 @@ export const getAvailableCoupons = async (data) => {
     throw error;
   }
 };
+
+export const getApplyCoupon = async (data) => {
+  try {
+    const response = await api.post("/apply-coupon", data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching addresses:", error);
+    throw error;
+  }
+};

@@ -25,6 +25,10 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if(!email || !password){
+      toast.error("Vui lòng nhập đầy đủ thông tin.");
+      return;
+    }
     setLoading(true);
 
     setTimeout(() => {

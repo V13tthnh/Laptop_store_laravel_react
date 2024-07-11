@@ -157,7 +157,7 @@ export default function Footer() {
                     <ul className="social-link">
                       <li className="twitter">
                         <a
-                          href=""
+                          href="#"
                           data-toggle="tooltip"
                           target="_blank"
                           title="Twitter"
@@ -167,7 +167,7 @@ export default function Footer() {
                       </li>
                       <li className="rss">
                         <a
-                          href=""
+                          href="#"
                           data-toggle="tooltip"
                           target="_blank"
                           title="RSS"
@@ -177,7 +177,7 @@ export default function Footer() {
                       </li>
                       <li className="google-plus">
                         <a
-                          href=""
+                          href="#"
                           data-toggle="tooltip"
                           target="_blank"
                           title="Google Plus"
@@ -187,7 +187,7 @@ export default function Footer() {
                       </li>
                       <li className="facebook">
                         <a
-                          href=""
+                          href="#"
                           data-toggle="tooltip"
                           target="_blank"
                           title="Facebook"
@@ -197,7 +197,7 @@ export default function Footer() {
                       </li>
                       <li className="youtube">
                         <a
-                          href=""
+                          href="#"
                           data-toggle="tooltip"
                           target="_blank"
                           title="Youtube"
@@ -207,7 +207,7 @@ export default function Footer() {
                       </li>
                       <li className="instagram">
                         <a
-                          href=""
+                          href="#"
                           data-toggle="tooltip"
                           target="_blank"
                           title="Instagram"

@@ -1,8 +1,7 @@
 import Carousel from "react-multi-carousel";
-import "react-multi-carousel/lib/styles.css";
-import SingleProduct from "./SingleProduct";
+import SingleProduct from "../layout/SingleProduct";
 import { useEffect, useState } from "react";
-import api from "../../api/api";
+import { getFeaturedProducts } from "../../api/product";
 
 const responsive = {
   largeDesktop: {
@@ -11,7 +10,7 @@ const responsive = {
   },
   desktop: {
     breakpoint: { max: 3000, min: 1024 },
-    items: 5,
+    items: 4,
   },
   tablet: {
     breakpoint: { max: 1024, min: 464 },
@@ -23,23 +22,22 @@ const responsive = {
   },
 };
 
-export default function BestSeller() {
-  const [products, setProducts] = useState([]);
+export default function FeaturedProduct() {
+  const [featuredProducts, setFeatureProducts] = useState([]);
+  useEffect(() => {fetchFeaturedProducts()}, []);
 
-  useEffect(() => {
-    api
-      .get("/laptops")
-      .then((res) => {
-        if (res.data.status) {
-          setProducts(res.data.data);
-        }
-      })
-      .catch((error) => console.log(error));
-  }, []);
+  const fetchFeaturedProducts = async () => {
+    try{
+      const response = await getFeaturedProducts();
+      setFeatureProducts(response.data); 
+    }catch(e){
+      console.log(e);
+    }
+  }
 
   return (
     <>
-      {products && (
+      {featuredProducts && (
         <section
           className="best-seller container"
           style={{
@@ -58,7 +56,7 @@ export default function BestSeller() {
                     style={{ marginLeft: "17px" }}
                   >
                     <span>
-                      <h4>Sản phẩm bán chạy</h4>
+                      <h4>Sản phẩm nổi bật</h4>
                     </span>
                   </div>
                 </div>
@@ -94,7 +92,7 @@ export default function BestSeller() {
                               dotListClass="custom-dot-list-style"
                               itemClass="carousel-item-padding-40-px"
                             >
-                              {products.map((item) => {
+                              {featuredProducts.map((item) => {
                                 return (
                                   <>
                                     <SingleProduct data={item} />

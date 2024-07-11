@@ -3,7 +3,7 @@ export default function NotFoundFilter() {
     <>
       <div
         className="att-no-products-found css-nq2gc4"
-        style={{ textAlign: "center", marginLeft: '30px' }}
+        style={{ textAlign: "center"}}
       >
         <div style={{ height: "400", width: "400" }} className="css-1tg24kl">
           <img

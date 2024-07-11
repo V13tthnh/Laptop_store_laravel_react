@@ -10,7 +10,7 @@ import { NavLink } from "react-router-dom";
 import useAuthContext from "../../context/AuthContext";
 
 export default function LeftSidebar(props) {
-  const { token, user, getUser, logout } = useAuthContext();
+  const { token, user, logout } = useAuthContext();
 
   const logoutHandle = () => {
     logout();
@@ -21,7 +21,13 @@ export default function LeftSidebar(props) {
       <div className="menuleft">
         <div className="menuleft__name">
           <h2>
-            Anh <b>{props.data?.full_name}</b>
+            {user && token ? (
+              <>
+                {user.gender === "Nam" ? "Anh" : "Chị"} <b>{user?.full_name}</b>
+              </>
+            ) : (
+              <>Anh Nguyễn Văn A</>
+            )}
           </h2>
         </div>
         <ul>
@@ -44,7 +50,7 @@ export default function LeftSidebar(props) {
           <li className="">
             <NavLink to="/account/addresses">
               <FontAwesomeIcon icon={faAddressBook} size="sm" /> Sổ địa chỉ
-            </NavLink >
+            </NavLink>
           </li>
           <li className="active">
             <NavLink to="/account/wishlist">
@@ -52,7 +58,7 @@ export default function LeftSidebar(props) {
             </NavLink>
           </li>
         </ul>
-        <a href="/lich-su-mua-hang/dang-xuat" className="btn-logout" onClick={logoutHandle}>
+        <a href="#" className="btn-logout" onClick={logoutHandle}>
           Đăng Xuất
         </a>
       </div>

@@ -18,7 +18,7 @@ export default function Wishlist() {
   useEffect(() => {
     if (!token && !user) {
       navigate("/login");
-      toast.error("Đã hết phiên đăng nhập, vui lòng đăng nhập lại.")
+      toast.error("Đã hết phiên đăng nhập, vui lòng đăng nhập lại.");
       return;
     }
   }, [token]);
@@ -31,6 +31,7 @@ export default function Wishlist() {
         name: product.name,
         slug: product.slug,
         image: `http://localhost:8000/${product.image}`,
+        product_specification_detail: product.product_specification_details,
         quantity: 1,
         unit_price: product.unit_price,
         sale_price: product.sale_price,
@@ -42,7 +43,7 @@ export default function Wishlist() {
   };
 
   const handleRemoveFromWishlist = (id) => {
-    dispatch(removeFromWishList(id));
+    dispatch(removeFromWishList({ id }));
     successNotify(`Đã xóa khỏi danh sách yêu thích`);
   };
 
@@ -52,7 +53,7 @@ export default function Wishlist() {
 
   return (
     <>
-    <ToastContainer 
+      <ToastContainer
         position="top-right"
         autoClose={3000}
         hideProgressBar={false}
@@ -63,7 +64,7 @@ export default function Wishlist() {
         draggable
         pauseOnHover
         theme="light"
-      /> 
+      />
       <div className="page-section mb-60">
         <div className="container">
           <section className="wrapper">
@@ -81,7 +82,8 @@ export default function Wishlist() {
                       </div>
                     </div>
                     <div className="viewedlist-account">
-                      {wishlistProducts.length > 0 ?  wishlistProducts.map((item) => {
+                      {wishlistProducts.length > 0 ? (
+                        wishlistProducts.map((item) => {
                           return (
                             <>
                               <div className="proloop" id="viewed-loop-1">
@@ -131,11 +133,6 @@ export default function Wishlist() {
                                         {item.name}
                                       </NavLink>
                                     </h3>
-                                    <Technical
-                                      technical={
-                                        item?.product_specification_detail
-                                      }
-                                    />
                                     <div className="proloop-price">
                                       {item.sale_price ? (
                                         <>
@@ -184,46 +181,63 @@ export default function Wishlist() {
                               </div>
                             </>
                           );
-                        }) :  (<><div className="css-1bqbden">
-                          <div className="card-body css-0">
-                            <div direction="column" className="css-18zym6u">
-                              <div style={{ width: "100%", marginLeft:'100%' }} className="css-11f6yue">
-                                <img
-                                  src="https://shopfront-cdn.tekoapis.com/static/empty_cart.png"
-                                  loading="lazy"
-                                  hover=""
-                                  decoding="async"
-                                  alt=""
-                                  fetchpriority="low"
-                                  style={{
-                                    width: "100%",
-                                    height: "100%",
-                                    objectFit: "inherit",
-                                    position: "absolute",
-                                    top: "0px",
-                                    left: "0px",
-                                  }}
-                                />
-                              </div>
-                              <div className="css-1qoenic" style={{ width: "100%", marginLeft:'110%' }}>Danh sách yêu thích chưa có sản phẩm nào</div>
-                              <NavLink to="/"
-                                height="2.5rem"
-                                color="white"
-                                className="buy-now css-fhio94"
-                                type="button"
-                                style={{ width: "100%", marginLeft:'100%' }}
-                              >
-                                <div type="body" className="button-text css-2h64mz" color="white" >
-                                  Mua sắm ngay
+                        })
+                      ) : (
+                        <>
+                          <div className="css-1bqbden">
+                            <div className="card-body css-0">
+                              <div direction="column" className="css-18zym6u">
+                                <div
+                                  style={{ width: "100%", marginLeft: "100%" }}
+                                  className="css-11f6yue"
+                                >
+                                  <img
+                                    src="https://shopfront-cdn.tekoapis.com/static/empty_cart.png"
+                                    loading="lazy"
+                                    hover=""
+                                    decoding="async"
+                                    alt=""
+                                    fetchpriority="low"
+                                    style={{
+                                      width: "100%",
+                                      height: "100%",
+                                      objectFit: "inherit",
+                                      position: "absolute",
+                                      top: "0px",
+                                      left: "0px",
+                                    }}
+                                  />
                                 </div>
-                                <span style={{ marginLeft: "0px" }}>
-                                  <div className="css-157jl91"></div>
-                                </span>
-                              </NavLink>
+                                <div
+                                  className="css-1qoenic"
+                                  style={{ width: "100%", marginLeft: "110%" }}
+                                >
+                                  Danh sách yêu thích chưa có sản phẩm nào
+                                </div>
+                                <NavLink
+                                  to="/"
+                                  height="2.5rem"
+                                  color="white"
+                                  className="buy-now css-fhio94"
+                                  type="button"
+                                  style={{ width: "100%", marginLeft: "100%" }}
+                                >
+                                  <div
+                                    type="body"
+                                    className="button-text css-2h64mz"
+                                    color="white"
+                                  >
+                                    Mua sắm ngay
+                                  </div>
+                                  <span style={{ marginLeft: "0px" }}>
+                                    <div className="css-157jl91"></div>
+                                  </span>
+                                </NavLink>
+                              </div>
                             </div>
                           </div>
-                        </div></>)
-                       }
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
