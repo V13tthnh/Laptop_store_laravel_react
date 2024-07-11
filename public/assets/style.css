@@ -217,6 +217,30 @@ a{
     transform: rotate(360deg);
   }
 }
+
+.search-bar-container{
+  display: flex;
+  position: relative;
+  background: #fff;
+  border-radius: 5px;
+  border: 1px solid #e1e1e1;
+  min-width: 638px;
+  height: 45px;
+  float: left;
+}
+
+.input-wrapper{
+  background-color: white;
+  width: 100%;
+  height: 2.5rem;
+  padding: 0 15px;
+  box-shadow: 0px 0px 8px #ddd;
+  display:flex;
+  align-items: center;
+}
+
+/* FLASHSALE */
+
 /*----------------------------------------*/
 /*  01. Dfault Style
 /*----------------------------------------*/
@@ -2119,6 +2143,16 @@ textarea:focus {
 .header-middle {
   padding: 30px;
 }
+/* .hm-searchbox {
+  display: flex;
+  position: relative;
+  background: #fff;
+  border-radius: 5px;
+  border: 1px solid #e1e1e1;
+  min-width: 638px;
+  height: 45px;
+  float: left;
+} */
 .hm-searchbox {
   display: flex;
   position: relative;
@@ -2129,6 +2163,37 @@ textarea:focus {
   height: 45px;
   float: left;
 }
+
+.search-container {
+  position: relative;
+}
+
+.product-dropdown {
+  position: absolute;
+  top: 45px;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  margin-right: 250px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.product-dropdown li {
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.product-dropdown li:hover {
+  background-color: #f0f0f0;
+}
+
+
 .hm-searchbox .nice-select.select-search-category {
   width: auto;
   line-height: 43px;

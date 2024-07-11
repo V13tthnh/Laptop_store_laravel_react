@@ -1,23 +1,49 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import { updateQuantity, removeFromCart } from "../../redux/slices/CartSlice";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import useDebounce from "../../hooks/debounce";
+import { clearCoupon } from "../../redux/slices/CouponSlice";
 
 export default function CartRow(props) {
   const [quantity, setQuantity] = useState(props.carts.quantity);
+  const cartItems = useSelector((state) => state.cart.items);
+  const coupon = useSelector((state) => state.coupon.items);
   const dispatch = useDispatch();
 
+  useEffect(()=>{
+    let total = calculateTotal(cartItems);
+    if (coupon) {
+      if (total < coupon.minimum_spend) {
+        dispatch(clearCoupon());
+      }
+    }
+  }, [cartItems]);
+
   const parseToNumber = (num) => {
-    const numberStr = num.replace(/\./g, "").replace(" vnđ", "");
-    const number = parseFloat(numberStr);
-    return number;
-  };
-  
-  const formatCurrency = (total) => {
-    return total.toLocaleString('vi-VN') + ' vnđ';
+    if (typeof num === "number") {
+      return num;
+    }
+    if (typeof num === "string") {
+      const numberStr = num.replace(/\./g, "").replace(" vnđ", "");
+      const number = parseFloat(numberStr);
+      return number;
+    }
+    return NaN;
   };
 
-  const lineItemTotals = parseInt(quantity) * parseToNumber(props.carts.unit_price);
+  const calculateTotal = (cart) => {
+    return cart.reduce((total, product) => {
+      return total + parseToNumber(product.unit_price) * product.quantity;
+    }, 0);
+  };
+
+  const formatCurrency = (total) => {
+    return total.toLocaleString("vi-VN") + " vnđ";
+  };
+
+  const lineItemTotals =
+    parseInt(quantity) * parseToNumber(props.carts.unit_price);
 
   const handleQuantityChange = (newQuantity) => {
     if (newQuantity >= 1 && newQuantity <= props.carts.availableQuantity) {
@@ -96,11 +122,11 @@ export default function CartRow(props) {
                       {props.carts.unit_price}
                     </span>
                   </div>
-                  <div className="teko-row teko-row-end teko-row-middle css-1qrgscw">
+                  {/* <div className="teko-row teko-row-end teko-row-middle css-1qrgscw">
                     <span className="product-price__listed-price att-strike-through-display-price css-10zxjrh">
                       29.990.000₫
                     </span>
-                  </div>
+                  </div> */}
                 </div>
               </div>
               <div className="teko-col teko-col-2 css-17ajfcv">
@@ -191,7 +217,7 @@ export default function CartRow(props) {
                   <div className="teko-row teko-row-end teko-row-middle css-1qrgscw">
                     <span
                       className="product-price__price css-rmdhxt"
-                      style={{ fontSize: "13px", marginLeft: '10px' }}
+                      style={{ fontSize: "13px", marginLeft: "10px" }}
                     >
                       {formatCurrency(lineItemTotals)}
                     </span>

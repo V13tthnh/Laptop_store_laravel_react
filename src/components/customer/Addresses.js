@@ -21,7 +21,7 @@ export default function Addresses() {
     if (!token) {
       navigator("/login");
       setTimeout(() => {
-        toast.error("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại");
+        toast.error("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.");
       }, 1000);
       return;
     }

@@ -87,7 +87,25 @@ export default function Account() {
   }
 
   const splitDate = (dateString) => {
-    const [day, month, year] = dateString.split("/");
+    if (typeof dateString !== "string") {
+      console.error("Invalid date string:", dateString);
+      return;
+    }
+
+    const parts = dateString.split("/");
+
+    if (parts.length !== 3) {
+      console.error("Invalid date format:", dateString);
+      return;
+    }
+
+    const [day, month, year] = parts;
+
+    if (isNaN(day) || isNaN(month) || isNaN(year)) {
+      console.error("Invalid date values:", dateString);
+      return;
+    }
+
     setDay(day);
     setMonth(month);
     setYear(year);
@@ -111,7 +129,7 @@ export default function Account() {
     try {
       setLoading(true);
       await updateProfile(profileObj);
-      toast.success("Cập nhật thành công.");
+      
       setErrors({});
     } catch (error) {
       if (error.response && error.response.data && error.response.data.errors) {
@@ -121,6 +139,7 @@ export default function Account() {
       }
     } finally {
       setLoading(false);
+      toast.success("Cập nhật thành công.");
     }
   };
 

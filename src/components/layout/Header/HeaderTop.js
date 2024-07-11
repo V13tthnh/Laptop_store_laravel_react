@@ -4,6 +4,8 @@ import {
   faLock,
   faUser,
   faRightFromBracket,
+  faAddressBook,
+  faHeart,
 } from "@fortawesome/free-solid-svg-icons";
 import { faFileInvoice } from "@fortawesome/free-solid-svg-icons";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -96,6 +98,20 @@ export default function HeaderTop() {
                             >
                               <FontAwesomeIcon icon={faLock} />
                               <span> Đổi mật khẩu</span>
+                            </NavLink>
+                            <NavLink
+                              className="dropdown-item"
+                              to="/account/addresses"
+                            >
+                              <FontAwesomeIcon icon={faAddressBook} />
+                              <span> Sổ địa chỉ</span>
+                            </NavLink>
+                            <NavLink
+                              className="dropdown-item"
+                              to="/account/wishlist"
+                            >
+                              <FontAwesomeIcon icon={faHeart} />
+                              <span> Sản phẩm yêu thích</span>
                             </NavLink>
                             <a
                               href=""

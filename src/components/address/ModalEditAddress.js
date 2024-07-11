@@ -23,23 +23,24 @@ import {
 } from "../../api/address";
 import "react-toastify/dist/ReactToastify.css";
 import useAuthContext from "../../context/AuthContext";
+import { ToastContainer } from "react-toastify";
 
 export default function ModalEditAddress({ data, onReload }) {
   const [open, setOpen] = useState(false);
   const [provinceData, setProvinceData] = useState([]);
   const [districtData, setDistrictData] = useState([]);
   const [wardData, setWardData] = useState([]);
-  const [provinces, setProvinces] = useState("");
+  const [provinces, setProvinces] = useState();
   const [provincesId, setProvincesId] = useState(0);
   const [districtId, setDisctricId] = useState(0);
-  const [districts, setDistricts] = useState("");
-  const [wards, setWards] = useState("");
+  const [districts, setDistricts] = useState();
+  const [wards, setWards] = useState();
   const [fullName, setFullName] = useState(data.full_name);
   const [phone, setPhone] = useState(data.phone);
   const [addressDetail, setAddressDetail] = useState(data.address_detail);
   const [errors, setErrors] = useState("");
   const { token, user } = useAuthContext();
-
+  console.log(data);
   useEffect(() => {
     loadProvinces();
     if (provinces) {
@@ -132,7 +133,7 @@ export default function ModalEditAddress({ data, onReload }) {
       ward: wards,
       user_id: user?.id,
     };
-    console.log(newAddress);
+
     try {
       await updateAddress(data.id, newAddress);
       resetForm();
@@ -149,6 +150,18 @@ export default function ModalEditAddress({ data, onReload }) {
 
   return (
     <>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <Button onClick={handleClickOpen} className="button add-new-address">
         Cập nhật
       </Button>

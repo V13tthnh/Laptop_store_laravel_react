@@ -3,7 +3,7 @@ import { applyCoupon, clearCoupon } from "../../redux/slices/CouponSlice";
 import { toast, ToastContainer } from "react-toastify";
 import { Button } from "@mui/material";
 
-export default function CouponItem({ data }) {
+export default function CouponItem({ data, closeModal }) {
   const dispatch = useDispatch();
   const coupon = useSelector((state) => state.coupon.items);
 
@@ -18,6 +18,7 @@ export default function CouponItem({ data }) {
         type: data.type,
       })
     );
+    closeModal();
   };
 
   const clearCouponClick = () => {

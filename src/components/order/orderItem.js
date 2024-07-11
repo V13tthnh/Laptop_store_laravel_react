@@ -1,110 +1,137 @@
-import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import useAuthContext from "../../context/AuthContext";
-import { deleteAddress } from "../../api/address";
-import { getAllOrders } from "../../api/order";
-import LoadingPage from "../common/LoadingPage";
+import { Button } from "@mui/material";
+import OrderDeleteModal from "./OrderDeleteModal";
+import api from "../../api/api";
+import { useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import { cancelOrder, reOrder } from "../../api/order";
 
-export default function OrderItem(props) {
-  const [errors, setErrors] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [orders, setOrders] = useState([]);
-  const { user } = useAuthContext();
+export default function OrderItem({ orders, reload }) {
+  const { token, user } = useAuthContext();
+  const [loading, setLoading] = useState();
+  const [errors, setErrors] = useState();
 
   const ORDER_STATUS = {
     1: "Chờ xử lý",
     2: "Đã xác nhận",
-    3: "Đang chuyển hàng",
-    4: "Đang giao hàng",
-    5: "Đã nhận được hàng",
-    6: "Đã hủy",
-    7: "Trả hàng/Hoàn tiền",
+    3: "Đang giao hàng",
+    4: "Đã hủy",
+    5: "Đã nhân được hàng",
   };
-  
-  const handleGetAllOrders = async () => {
+
+  const handleCancelOrder = async (id) => {
     try {
-    setLoading(true);
-      var response = await getAllOrders({user_id: user?.id});
-      setOrders(response.data);
+      await cancelOrder({ order_id: id });
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.errors) {
-        setErrors(error.response.data.errors);
-      } else {
-        setErrors({ submit: "Failed to add address" });
-      }
-    }finally{
-        setLoading(false);
+      console.error("Failed to load addresses:", error);
+    } finally {
+      toast.success("Đơn hàng đã được hủy thành công.");
+      reload();
+      setLoading(false);
     }
   };
 
-  useState(() => {
-    handleGetAllOrders();
-    console.log(orders)
-  }, []);
-
-if(loading){
-    return <LoadingPage/>
-}
+  const handleReOrder = async (id) => {
+    try {
+      const response = await reOrder({ order_id: id });
+      if (response.data.status) {
+        toast.success(response.data.message);
+        reload();
+      }
+    } catch (error) {
+      console.error("Failed to load addresses:", error);
+    } finally {
+      toast.success("Đơn hàng đã được mua lại.");
+      reload();
+      setLoading(false);
+    }
+  };
 
   return (
     <>
+      <ToastContainer />
       {orders &&
-        orders.map((item) => {
+        orders.map((order) => {
           return (
             <>
               <div className="order-item hisOrderType_1 ">
                 <div className="item-head ">
                   <div className="head-info inline">
                     <div className="order_id">
-                      <b>Đơn hàng:</b>&nbsp;<span>#12481SH23030022190 </span>
+                      <b>Đơn hàng:</b>&nbsp;<span>#{order.id} </span>
                     </div>
                   </div>
-                  <b className="success order-status" data-status="Success">
-                 {ORDER_STATUS[item.status]}
+                  <b className="success order-status" data-status="Success" style={order.status === 5 ? { color: 'rgba(40, 199, 111, 0.7)' } : {}}>
+                    {ORDER_STATUS[order.status]}
                   </b>
                 </div>
                 <div className="item-content">
-                  <div className="content-left">
-                    <a
-                      href="/lich-su-mua-hang/don-hang-erp-12481SO23030022191"
-                      data-id="12481SH23030022190  "
-                      className="thumb-wrapper ordertypeweb_5"
-                    >
-                      <img
-                        className="thumb-main"
-                        src="images/product/hp-15-fd0303tu-i3-a2nl4pa-glr-2.jpg"
-                      />
-                    </a>
-                  </div>
-                  <div className="content-right">
-                    <a
-                      href="/lich-su-mua-hang/"
-                      data-id="12481SH23030022190  "
-                      className="order_item order-name"
-                      onclick="SaveScrollBtnDetail()"
-                    >
-                      Laptop HP 15 fd0303TU i3 1315U/8GB/512GB/Win11 (A2NL4PA)
-                    </a>
-                    <div className="content-wrapper_right">
-                      <p className="total-price_wrapper">
-                        Tổng tiền:
-                        <span className="total-price"> 170.000.000₫</span>
-                      </p>
+                  {order.products.map((product) => {
+                    return (
+                      <>
+                        <div className="content-left">
+                          <NavLink
+                            to={`/laptop/${product.slug}`}
+                            className="thumb-wrapper ordertypeweb_5"
+                          >
+                            <img
+                              className="thumb-main"
+                              src={`http://localhost:8000/${product.first_image?.url}`}
+                              alt=""
+                            />
+                          </NavLink>
+                        </div>
+                        <div className="content-right">
+                          <NavLink
+                            to={`/laptop/${product.slug}`}
+                            data-id="12481SH23030022190  "
+                            className="order_item order-name"
+                          >
+                            {product.name}
+                          </NavLink>
+                        </div>
+                      </>
+                    );
+                  })}
+                </div>
+                <div className="content-wrapper_right">
+                  <p className="total-price_wrapper" style={{ color: "red" }}>
+                    <span className="total-price">
+                      Tổng tiền: <b>{order.total}</b>
+                    </span>
+                  </p>
 
-                      <div className="order-info__paymentdetail"></div>
-                    </div>
-                  </div>
+                  <div className="order-info__paymentdetail"></div>
                 </div>
                 <div className="item-foot">
                   <div className="link ">
                     <NavLink
-                      to="/account/order/detail"
+                      to={`/account/order/detail/${order.id}`}
                       data-id="12481SH23030022190  "
                       className="btn-detail"
                       onclick="SaveScrollBtnDetail()"
                     >
                       Xem chi tiết
                     </NavLink>
+                    {order.status === 1 &&  order.formality !== 1 && (
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => handleCancelOrder(order.id)}
+                      >
+                        Hủy đơn
+                      </Button>
+                    )}
+                    {order.status === 4 && (
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => handleReOrder(order.id)}
+                      >
+                        Mua lại
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>

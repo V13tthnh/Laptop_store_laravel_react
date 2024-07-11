@@ -1,12 +1,14 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Searchbar from "../SearchBar";
+import useAuthContext from "../../../context/AuthContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCodeCompare } from "@fortawesome/free-solid-svg-icons";
 
 export default function HeaderMiddle() {
+  const { token, user } = useAuthContext();
   const cartItems = useSelector((state) => state.cart.items);
-  const wishlistItems = useSelector((state) => state.wishlist.items);
+  const CompareItems = useSelector((state) => state.compare.items);
 
   return (
     <>
@@ -16,7 +18,8 @@ export default function HeaderMiddle() {
             <div className="col-lg-3">
               <div className="logo pb-sm-30 pb-xs-30">
                 <NavLink to="/">
-                  <img src="../../assets/images/menu/logo/1.jpg" alt="" />
+                  {/* <img src="/assets/images/logo3.png" alt="" style={{height:'100px', width: '100%'}}/> */}
+                  <b>THÀNH NGHĨA LAPTOP</b>
                 </NavLink>
               </div>
             </div>
@@ -27,13 +30,16 @@ export default function HeaderMiddle() {
               <div className="header-middle-right">
                 <ul className="hm-menu">
                   <li className="hm-wishlist">
-                    <NavLink to="/account/wishlist">
+                    <NavLink
+                      to={token && user ? "/laptops/compare" : "/login"}
+                    >
                       <span className="cart-item-count wishlist-item-count">
-                        {wishlistItems.length}
+                        {CompareItems.length}
                       </span>
-                      <i className="fa fa-heart-o"></i>
+                      <FontAwesomeIcon icon={faCodeCompare} />
                     </NavLink>
                   </li>
+
                   <li className="hm-minicart">
                     <NavLink to="/cart">
                       <div className="hm-minicart-trigger">
@@ -46,72 +52,6 @@ export default function HeaderMiddle() {
                         </span>
                       </div>
                     </NavLink>
-                    <span></span>
-                    <div className="minicart">
-                      <ul className="minicart-product-list">
-                        <li>
-                          <NavLink
-                            to="/cart"
-                            className="minicart-product-image"
-                          >
-                            <img
-                              src="../../assets/images/product/small-size/5.jpg"
-                              alt="cart products"
-                            />
-                          </NavLink>
-                          <div className="minicart-product-details" active>
-                            <h6>
-                              <a href="single-product.html">
-                                Aenean eu tristique
-                              </a>
-                            </h6>
-                            <span>£40 x 1</span>
-                          </div>
-                          <button className="close" title="Remove">
-                            <i className="fa fa-close"></i>
-                          </button>
-                        </li>
-                        <li>
-                          <a
-                            href="single-product.html"
-                            className="minicart-product-image"
-                          >
-                            <img
-                              src="../../assets/images/product/small-size/6.jpg"
-                              alt="cart products"
-                            />
-                          </a>
-                          <div className="minicart-product-details">
-                            <h6>
-                              <a href="single-product.html">
-                                Aenean eu tristique
-                              </a>
-                            </h6>
-                            <span>£40 x 1</span>
-                          </div>
-                          <button className="close" title="Remove">
-                            <i className="fa fa-close"></i>
-                          </button>
-                        </li>
-                      </ul>
-                      <p className="minicart-total">
-                        SUBTOTAL: <span>£80.00</span>
-                      </p>
-                      <div className="minicart-button">
-                        <a
-                          href="shopping-cart.html"
-                          className="li-button li-button-fullwidth li-button-dark"
-                        >
-                          <span>Xem giỏ hàng</span>
-                        </a>
-                        <a
-                          href="checkout.html"
-                          className="li-button li-button-fullwidth"
-                        >
-                          <span>Thanh toán</span>
-                        </a>
-                      </div>
-                    </div>
                   </li>
                 </ul>
               </div>

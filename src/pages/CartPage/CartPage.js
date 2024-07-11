@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Footer from "../../components/layout/Footer";
 import Header from "../../components/layout/Header/Header";
 import "../CartPage/CartPage.css";
@@ -13,6 +13,8 @@ import { setTotal } from "../../redux/slices/CartSlice";
 import CouponModal from "../../components/coupon/CouponModal";
 import useAuthContext from "../../context/AuthContext";
 import CartDiscount from "../../components/cart/CartDiscount";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHome } from "@fortawesome/free-solid-svg-icons";
 
 export default function CartPage() {
   const { token, user } = useAuthContext();
@@ -20,8 +22,17 @@ export default function CartPage() {
   const cartItems = useSelector((state) => state.cart.items);
   const cartTotal = useSelector((state) => state.cart.total);
   const coupon = useSelector((state) => state.coupon.items);
-
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!token) {
+      navigate("/login");
+      setTimeout(() => {
+        toast.error("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại");
+      }, 1000);
+      return;
+    }
+  }, [token]);
 
   const handleClearCart = () => {
     dispatch(clearCart());
@@ -29,9 +40,15 @@ export default function CartPage() {
   };
 
   const parseToNumber = (num) => {
-    const numberStr = num.replace(/\./g, "").replace(" vnđ", "");
-    const number = parseFloat(numberStr);
-    return number;
+    if (typeof num === "number") {
+      return num;
+    }
+    if (typeof num === "string") {
+      const numberStr = num.replace(/\./g, "").replace(" vnđ", "");
+      const number = parseFloat(numberStr);
+      return number;
+    }
+    return NaN;
   };
 
   const calculateTotal = (cart) => {
@@ -68,7 +85,7 @@ export default function CartPage() {
         case 1: // Giảm giá theo %
           total = total * ((100 - coupon.value) / 100);
           break;
-        case 2:// Giảm giá theo giá tiền
+        case 2: // Giảm giá theo giá tiền
           total -= coupon.value;
           break;
         case 3: // Giảm giá giao hàng
@@ -82,6 +99,9 @@ export default function CartPage() {
   };
 
   const formatCurrency = (total) => {
+    if (total === undefined) {
+      return "Dữ liệu không xác định";
+    }
     return total.toLocaleString("vi-VN") + " vnđ";
   };
 
@@ -102,6 +122,23 @@ export default function CartPage() {
       <ToastContainer />
       <Header />
       <div>
+        <div class="breadcrumb-area">
+          <div class="container">
+            <div class="breadcrumb-content">
+              <ul>
+                <li>
+                  <NavLink to="/">
+                    <FontAwesomeIcon icon={faHome} size="sm" /> Trang chủ
+                  </NavLink>
+                </li>
+
+                <li>
+                  <NavLink to={`/laptop`}>Giỏ hàng</NavLink>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
         <div className="css-cssveg">
           <div className=" css-27abj6">
             <div className="css-163sceo">
@@ -252,38 +289,7 @@ export default function CartPage() {
               </div>
             </div>
             <div className="css-bvrx60">
-              <div className="css-seb2g4">
-                <a href="/" className="breadcrumb-item css-1s8chay">
-                  <div type="body" className="css-kwe6s1">
-                    Trang chủ
-                  </div>
-                </a>
-                <div className="css-889chh">
-                  <svg
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    size="16"
-                    className="css-26qhcs"
-                    color="placeholder"
-                    height="16"
-                    width="16"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M8.49976 19.0001L15.4998 12.0001L8.49976 5.00012"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    ></path>
-                  </svg>
-                </div>
-                <a href="#" disabled="" className="breadcrumb-item css-4jp5hh">
-                  <div type="body" className="css-kwe6s1">
-                    Giỏ hàng
-                  </div>
-                </a>
-              </div>
+            
               <div className="css-117j3zt">
                 <div className="css-8x68m">
                   <div className="css-1knbux5">
@@ -359,8 +365,9 @@ export default function CartPage() {
                       {!coupon ? (
                         <>
                           <div className="css-twos5s">
-                            Đơn hàng chưa đủ điều kiện áp dụng khuyến mãi. Vui
-                            lòng mua thêm để áp dụng
+                            Đơn hàng chưa có khuyến mãi nào, vui lòng chọn nhập
+                            hoặc chọn khuyến mãi để nhận thêm nhiều ưu đãi từ
+                            chúng tôi.
                           </div>
                         </>
                       ) : (
@@ -409,7 +416,6 @@ export default function CartPage() {
 
                                 {coupon && (
                                   <>
-                                    {" "}
                                     <tr>
                                       <td
                                         color="#848788"
@@ -429,7 +435,11 @@ export default function CartPage() {
                                         className="css-fsu5pb"
                                       >
                                         {coupon.type === 1
-                                          ? `-${formatCurrency(getTotal() * (1 - (coupon.value / 100)))}`
+                                          ? `-${formatCurrency(
+                                              (calculateTotal(cartItems) *
+                                                coupon.value) /
+                                                100
+                                            )}`
                                           : coupon.type === 2
                                           ? `-${formatCurrency(coupon.value)}`
                                           : `-${formatCurrency(coupon.value)}`}
@@ -457,7 +467,11 @@ export default function CartPage() {
                             data-content-name="checkout"
                             className="css-0"
                           >
-                            <NavLink to={token && user ? '/cart/checkout' : '/login'} className="att-checkout-button css-v463h2" onClick={handleSetTotal}>
+                            <NavLink
+                              to={token && user ? "/cart/checkout" : "/login"}
+                              className="att-checkout-button css-v463h2"
+                              onClick={handleSetTotal}
+                            >
                               <div className="css-1lqe6yk">TIẾP TỤC</div>
                             </NavLink>
                           </div>

@@ -15,22 +15,18 @@ export default function BreadCrumb({ categories, productName }) {
                   <FontAwesomeIcon icon={faHome} size="lg" /> Trang chủ
                 </NavLink>
               </li>
+
+              <li>
+                <NavLink to={`/laptop`}>Laptop</NavLink>
+              </li>
               {categories && (
                 <li>
-                  <NavLink to={`/${categories.parent.slug}`}>
-                    {categories.parent.name}
-                  </NavLink>
-                </li>
-              )}
-              {categories && (
-                <li>
-                  <NavLink to={`/${categories.parent.slug}/${categories.slug}`}>
-                    {categories.name}
+                  <NavLink to={`/${categories?.parent?.slug}/${categories?.slug}`}>
+                    {categories?.name}
                   </NavLink>
                 </li>
               )}
               {productName && <li>{productName}</li>}
-             
             </ul>
           </div>
         </div>

@@ -6,9 +6,7 @@ import {
   DialogContent,
   DialogContentText,
   Box,
-  Checkbox,
   FormControl,
-  FormControlLabel,
   InputLabel,
   MenuItem,
   Select,
@@ -22,6 +20,7 @@ import {
   getProvinces,
 } from "../../api/address";
 import useAuthContext from "../../context/AuthContext";
+import { ToastContainer } from "react-toastify";
 
 export default function AddAddressModal({ onAddSuccess }) {
   const [open, setOpen] = useState(false);
@@ -37,6 +36,7 @@ export default function AddAddressModal({ onAddSuccess }) {
   const [phone, setPhone] = useState("");
   const [addressDetail, setAddressDetail] = useState("");
   const [errors, setErrors] = useState("");
+  const [error, setError] = useState("");
   const { user } = useAuthContext();
 
   useEffect(() => {
@@ -82,7 +82,22 @@ export default function AddAddressModal({ onAddSuccess }) {
   };
 
   const handlePhoneChange = (event) => {
-    setPhone(event.target.value);
+    const value = event.target.value;
+    setPhone(value);
+    if (!validatePhone(value)) {
+      setError("Số điện thoại không hợp lệ");
+    } else {
+      setError("");
+    }
+  };
+
+  const handleBlur = (e) => {
+    const value = e.target.value;
+    if (!validatePhone(value)) {
+      setError("Số điện thoại gồm 10 số và bắt đầu bằng 0.");
+    } else {
+      setError("");
+    }
   };
 
   const handleFullNameChange = (event) => {
@@ -119,35 +134,62 @@ export default function AddAddressModal({ onAddSuccess }) {
     setPhone("");
     setAddressDetail("");
     setErrors({});
+    setError("");
   };
 
   const handleAddAddress = async () => {
-    let newAddress = {
-      full_name: fullName,
-      phone: phone,
-      provinces: provinces,
-      district: districts,
-      address_detail: addressDetail,
-      ward: wards,
-      user_id: user?.id,
-    };
-    try {
-      await createAddress(newAddress);
+    if (validatePhone(phone)) {
+      setError("");
+      let newAddress = {
+        full_name: fullName,
+        phone: phone,
+        provinces: provinces,
+        district: districts,
+        address_detail: addressDetail,
+        ward: wards,
+        user_id: user?.id,
+      };
+      try {
+        await createAddress(newAddress);
 
-      resetForm();
-      setOpen(false);
-      onAddSuccess("Thêm địa chỉ thành công.");
-    } catch (error) {
-      if (error.response && error.response.data && error.response.data.errors) {
-        setErrors(error.response.data.errors);
-      } else {
-        setErrors({ submit: "Failed to add address" });
+        resetForm();
+        setOpen(false);
+        onAddSuccess("Thêm địa chỉ thành công.");
+      } catch (error) {
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.errors
+        ) {
+          setErrors(error.response.data.errors);
+        } else {
+          setErrors({ submit: "Failed to add address" });
+        }
       }
+    } else {
+      setError("Số điện thoại không hợp lệ");
     }
+  };
+
+  const validatePhone = (phone) => {
+    const phoneRegex = /^[0-9]{10}$/;
+    return phoneRegex.test(phone);
   };
 
   return (
     <>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <Button
         onClick={handleClickOpen}
         height="2.5rem"
@@ -239,11 +281,13 @@ export default function AddAddressModal({ onAddSuccess }) {
                             label="Số điện thoại"
                             maxRows={12}
                             onChange={handlePhoneChange}
+                            onBlur={handleBlur}
                           />
                         </div>
                         {errors.phone && (
                           <p style={{ color: "red" }}>{errors.phone}</p>
                         )}
+                        {error && <p style={{ color: "red" }}>{error}</p>}
                       </Box>
                     </div>
                     <h5>Địa chỉ</h5>

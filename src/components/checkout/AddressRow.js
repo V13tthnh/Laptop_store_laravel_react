@@ -3,6 +3,7 @@ import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import { setDefaultAddress } from "../../api/address";
 import useAuthContext from "../../context/AuthContext";
+import { ToastContainer } from "react-toastify";
 
 export default function AddressRow({ id, data, reLoad }) {
   const {user} = useAuthContext();
@@ -24,6 +25,18 @@ export default function AddressRow({ id, data, reLoad }) {
 
   return (
     <>
+    <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       {/* {".css-64rk53 - ko  viền, css-1014eaz - viền xanh "} */}
       <div
         data-content-region-name="shippingAddress"

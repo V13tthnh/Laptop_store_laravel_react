@@ -6,11 +6,12 @@ import cartReducer from "./slices/CartSlice";
 import couponReducer from "./slices/CouponSlice";
 import wishlistReducer from "./slices/WishListSlice";
 import viewedReducer from "./slices/ViewedSlice";
+import ProductCompareSlice from "./slices/ProductCompareSlice";
 
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["cart", "coupon", "wishlist", "viewed"],
+  whitelist: ["cart", "coupon", "wishlist", "viewed", "compare"],
 };
 
 const rootReducer = combineReducers({
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
   wishlist: wishlistReducer,
   viewed: viewedReducer,
   coupon: couponReducer,
+  compare: ProductCompareSlice
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

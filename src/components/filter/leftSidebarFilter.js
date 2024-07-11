@@ -15,6 +15,12 @@ const formatCurrency = (value) => {
 export default function LeftSidebarFilter() {
   const [price, setPrice] = useState([0, 145000000]);
   const [brands, setBrands] = useState([]);
+  const [filters, setFilters] = useState({
+    cpu: '',
+    ram: '',
+    hardware: '',
+    screen: ''
+  });
 
   const handlePriceChange = (event, newValue) => {
     setPrice(newValue);

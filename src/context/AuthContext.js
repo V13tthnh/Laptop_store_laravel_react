@@ -8,9 +8,19 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
-  const [token, setToken] = useState(null);
+  const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [user, setUser] = useState(null);
   const [errors, setErrors] = useState(null);
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+
+    if (storedToken) {
+      setToken(storedToken);
+      api.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
+      getUser(storedToken);
+    }
+  }, []);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -19,7 +29,15 @@ export const AuthProvider = ({ children }) => {
       api.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
       getUser(storedToken);
     }
-  }, []);
+  }, [token]);
+
+  const handleSetToken = async (token) => {
+    localStorage.setItem("token", token);
+    setToken(token);
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    getUser(token);
+    navigate("/");
+  };
 
   const getUser = async (token) => {
     try {
@@ -69,7 +87,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const callback = async ({provider, location}) => {
+  const callback = async ({ provider, location }) => {
     try {
       await api.get(`auth/callback/${provider}?${location}`);
       const query = new URLSearchParams(location.search);
@@ -123,6 +141,7 @@ export const AuthProvider = ({ children }) => {
         logout,
         redirect,
         callback,
+        handleSetToken,
       }}
     >
       {children}

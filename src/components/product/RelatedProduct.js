@@ -26,7 +26,8 @@ const responsive = {
   },
 };
 
-export default function RelatedProduct({product_id}) {
+export default function RelatedProduct({ product_id }) {
+
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
@@ -34,27 +35,34 @@ export default function RelatedProduct({product_id}) {
   }, []);
 
   const fetchRelatedProducts = async () => {
-    try{
-      const response = await getRelatedProducts({product_id: product_id});
+    try {
+      const response = await getRelatedProducts({ product_id: product_id });
       setProducts(response.data);
-    }catch(e){
+    } catch (e) {
       console.log(e);
     }
-  }
+  };
 
   console.log(products);
   return (
     <>
       <section
         className="best-seller container"
-        style={{ background: "#fff", marginTop: "40px",marginBottom: "40px", borderRadius: "10px" }}
+        style={{
+          background: "#fff",
+          marginTop: "40px",
+          marginBottom: "40px",
+          borderRadius: "10px",
+        }}
       >
         <div className="product-area pt-60 pb-50">
           <div className="container">
             <div className="row">
               <div className="col-lg-12">
                 <div className="li-product-tab" style={{ marginLeft: "17px" }}>
-                  <span><h4>Sản phẩm liên quan</h4></span>
+                  <span>
+                    <h4>Sản phẩm liên quan</h4>
+                  </span>
                 </div>
               </div>
             </div>
@@ -71,32 +79,35 @@ export default function RelatedProduct({product_id}) {
                       style={{ marginTop: "20px" }}
                     >
                       <div className="container">
-                        <Carousel
-                          autoPlay={true}
-                          draggable={false}
-                          showDots={false}
-                          responsive={responsive}
-                          ssr={true} // means to render carousel on server-side.
-                          infinite={true}
-                          autoPlaySpeed={2000}
-                          keyBoardControl={true}
-                          customTransition="all .5"
-                          transitionDuration={500}
-                          containerClass="carousel-container"
-                          removeArrowOnDeviceType={["tablet", "mobile"]}
-                          deviceType={"desktop"}
-                          dotListClass="custom-dot-list-style"
-                          itemClass="carousel-item-padding-40-px"
-                        >
-                          {products && products.map(item => {
-                            return(<><SingleProduct data={item} /></>)
-                          })}
-                          
-                          <SingleProduct url={product2} />
-                          <SingleProduct url={product1} />
-                          <SingleProduct url={product2} />
-                          <SingleProduct url={product1} />
-                        </Carousel>
+                        {products && (
+                          <>
+                            <Carousel
+                              autoPlay={true}
+                              draggable={false}
+                              showDots={false}
+                              responsive={responsive}
+                              ssr={true}
+                              infinite={true}
+                              autoPlaySpeed={2000}
+                              keyBoardControl={true}
+                              customTransition="all .5"
+                              transitionDuration={500}
+                              containerClass="carousel-container"
+                              removeArrowOnDeviceType={["tablet", "mobile"]}
+                              deviceType={"desktop"}
+                              dotListClass="custom-dot-list-style"
+                              itemClass="carousel-item-padding-40-px"
+                            >
+                              {products.map((item) => {
+                                return (
+                                  <>
+                                    <SingleProduct data={item} />
+                                  </>
+                                );
+                              })}
+                            </Carousel>
+                          </>
+                        )}
                       </div>
                     </section>
                   </div>

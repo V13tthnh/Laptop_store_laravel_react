@@ -32,6 +32,15 @@ export default function RegisterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    if (
+      name === null ||
+      email === null ||
+      password === null ||
+      passwordConfirmation === null
+    ) {
+      toast.error("Vui lòng nhập đầy đủ thông tin.");
+      return;
+    }
 
     register({
       full_name: name,
@@ -39,6 +48,8 @@ export default function RegisterPage() {
       password,
       password_confirmation: passwordConfirmation,
     });
+    setLoading(false);
+    resetForm();
     if (!errors) {
       resetForm();
       setLoading(false);
@@ -119,7 +130,7 @@ export default function RegisterPage() {
                   onClick={toggleShowPassword}
                 ></i>
                 {errors && errors.password && (
-                  <div className="error">{errors.password[0]}</div>
+                  <p className="error">{errors.password[0]}</p>
                 )}
               </div>
               {/* password_confirmation */}
@@ -144,7 +155,7 @@ export default function RegisterPage() {
                   onClick={toggleShowPasswordConfirmation}
                 ></i>
                 {errors && errors.password_confirmation && (
-                  <div className="error">{errors.password_confirmation[0]}</div>
+                  <p className="error">{errors.password_confirmation[0]}</p>
                 )}
               </div>
               <div className="field button-field">
