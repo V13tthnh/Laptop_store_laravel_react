@@ -12,18 +12,19 @@ import RelatedProduct from "../product/RelatedProduct";
 import QuantitySelector from "../product/ProductDetail.js/QuantitySelector";
 import BreadCrumb from "../common/BreadCrumb";
 import { addToCart } from "../../redux/slices/CartSlice";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { useDispatch, useSelector } from "react-redux";
 import Modal from "../common/Modal";
 import { addToWishList } from "../../redux/slices/WishListSlice";
-import { addViewed, clearViewed } from "../../redux/slices/ViewedSlice";
+import { addViewed } from "../../redux/slices/ViewedSlice";
+import { showFailedAlert, showSuccessAlert } from "../../utils/toastify";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function ProductDetail(props) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [slideIndex, setSlideIndex] = useState(1);
   const dispatch = useDispatch();
-  const viewed = useSelector((state) => state.viewed.items);
+  const cartItems = useSelector((state) => state.cart.items);
 
   const [width, setWidth] = useState(0);
   const [start, setStart] = useState(0);
@@ -31,33 +32,17 @@ export default function ProductDetail(props) {
 
   const slideRef = useRef();
   const [quantity, setQuantity] = useState(1);
- 
+
   useEffect(() => {
-    dispatch(
-      addViewed(props.productDetail)
-    );
+    dispatch(addViewed(props.productDetail));
   }, [dispatch]);
 
-  const handleClearViewed = () => {
-    dispatch(clearViewed());
-  }
-
-  const successNotify = (message) => {
-    toast.success(message, {
-      position: "top-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-      transition: "Bounce",
-    });
-  };
-
-  //Thêm vào giỏ hàng
   const handleAddToCart = (product) => {
+    if (!validateAddToCart({ ...product, quantity }, cartItems)) {
+      showFailedAlert("Không thể thêm vào giỏ hàng vượt quá số lượng có sẵn.");
+      return;
+    }
+
     dispatch(
       addToCart({
         id: product.id,
@@ -72,7 +57,31 @@ export default function ProductDetail(props) {
         availableQuantity: product.quantity,
       })
     );
-    successNotify(`Đã thêm ${quantity} sản phẩm vào giỏ hàng.`);
+    showSuccessAlert("Đã thêm sản phẩm vào giỏ hàng.");
+  };
+
+  const validateAddToCart = (item, existingItems) => {
+    const existingItem = existingItems.find((i) => i.id === item.id);
+
+    if (existingItem) {
+      const newQuantity = existingItem.quantity + item.quantity;
+
+      if (newQuantity > item.availableQuantity) {
+        showFailedAlert(
+          "Không thể thêm vào giỏ hàng vượt quá số lượng có sẵn."
+        );
+        return false;
+      }
+    } else {
+      if (item.quantity > item.availableQuantity) {
+        showFailedAlert(
+          "Không thể thêm vào giỏ hàng vượt quá số lượng có sẵn."
+        );
+        return false;
+      }
+    }
+
+    return true;
   };
 
   const handleAddToWishlist = (product) => {
@@ -84,13 +93,13 @@ export default function ProductDetail(props) {
         image: `http://localhost:8000/${product.images[0]?.url}`,
         quantity: quantity,
         product_specification_detail:
-        props.productDetail?.product_specification_details,
+          props.productDetail?.product_specification_details,
         unit_price: product.unit_price,
         sale_price: product.sale_price,
         availableQuantity: product.quantity,
       })
     );
-    successNotify(`Đã thêm vào danh sách yêu thích`);
+    showSuccessAlert("Đã thêm vào danh sách yêu thích.");
   };
 
   const increaseQuantity = () => {
@@ -106,7 +115,7 @@ export default function ProductDetail(props) {
   };
 
   const handleQuantityChange = (e) => {
-    const value = parseInt(e.target.value, 10);
+    let value = parseInt(e.target.value, 10);
     if (value > 0) {
       setQuantity(value);
     }
@@ -171,18 +180,7 @@ export default function ProductDetail(props) {
 
   return (
     <>
-     <ToastContainer 
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      /> 
+      <ToastContainer />
       <BreadCrumb
         categories={props.productDetail?.category}
         productName={props.productDetail?.name}
@@ -414,7 +412,7 @@ export default function ProductDetail(props) {
                       <small style={{ color: "#6D6E72" }}>(0 đánh giá)</small>
                     </div>
                   </div>
-                  <Compare data={props.productDetail}/>
+                  <Compare data={props.productDetail} />
                   <div className="price-box pt-20">
                     <span className="new-price new-price-2">
                       {props.productDetail?.sale_price
@@ -445,10 +443,7 @@ export default function ProductDetail(props) {
                       <FontAwesomeIcon icon={faCheck} color="green" /> Hỗ trợ
                       đổi mới trong 7 ngày.
                     </p>
-                    <p>
-                      <FontAwesomeIcon icon={faCheck} color="green" /> Miễn phí
-                      giao hàng toàn quốc.
-                    </p>
+
                     <p>
                       <FontAwesomeIcon icon={faCheck} color="green" /> Windows
                       bản quyền tích hợp.
@@ -463,12 +458,13 @@ export default function ProductDetail(props) {
                             onIncrease={increaseQuantity}
                             onDecrease={decreaseQuantity}
                             onChange={handleQuantityChange}
+                            validQuantity={props.productDetail?.quantity}
                           />
                           <button
                             className="add-to-cart"
                             onClick={() => handleAddToCart(props.productDetail)}
                           >
-                            Mua Ngay
+                            Thêm vào giỏ
                           </button>
                         </div>
                       </div>
@@ -507,7 +503,6 @@ export default function ProductDetail(props) {
                           config={editorConfiguration}
                           disabled
                         />
-                        {/* <span dangerouslySetInnerHTML={{ __html: props.productDetail?.description }} ></span> */}
                       </p>
                       <div className="desc-btn">
                         <button

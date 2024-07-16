@@ -3,10 +3,11 @@ import LeftSidebar from "./LeftSidebar";
 import OrderItem from "../order/orderItem";
 import { useEffect, useState } from "react";
 import useAuthContext from "../../context/AuthContext";
-import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 import { getOrders } from "../../api/order";
 import LoadingPage from "../common/LoadingPage";
+import { showFailedAlert } from "../../utils/toastify";
 
 const ORDER_STATUS = {
   ALL: 0,
@@ -30,18 +31,21 @@ export default function Orders() {
     if (!token && !user) {
       setTimeout(() => {
         navigator("/login");
-        toast.error("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại");
+        showFailedAlert("Vui lòng đăng nhập lại");
       }, 3000);
       return;
     }
   }, [token]);
 
-  const handleGetAllOrders = async () => {
+  const handleGetAllOrders = async (id) => {
     try {
       setLoading(true);
-      var response = await getOrders({ user_id: user.id });
-      setOrders(response.data);
-      setOriginalOrders(response.data);
+      var response = await getOrders({ user_id: id });
+
+      const fetchedOrders = response.data;
+      fetchedOrders.sort((a, b) => b.id - a.id);
+      setOrders(fetchedOrders);
+      setOriginalOrders(fetchedOrders);
     } catch (error) {
       if (error.response && error.response.data && error.response.data.errors) {
         setErrors(error.response.data.errors);
@@ -54,12 +58,12 @@ export default function Orders() {
   };
 
   useEffect(() => {
-    handleGetAllOrders();
-  }, []);
+    handleGetAllOrders(user?.id);
+  }, [user?.id]);
 
   const reloadOrder = () => {
-    handleGetAllOrders();
-  }
+    handleGetAllOrders(user?.id);
+  };
 
   if (loading) {
     return <LoadingPage />;
@@ -68,10 +72,8 @@ export default function Orders() {
   const handleFilterChange = (status) => {
     if (status === ORDER_STATUS.ALL) {
       setOrders(originalOrders);
-    } else {;
-      setOrders(originalOrders)
-      
-      const filtered = orders.filter((order) => order.status === status);
+    } else {
+      const filtered = originalOrders.filter((order) => order.status === status);
       setOrders(filtered);
     }
     setFilter(status);
@@ -79,7 +81,7 @@ export default function Orders() {
 
   return (
     <>
-      <ToastContainer />
+    <ToastContainer/>
       <div className="page-section mb-60">
         <div className="container">
           <section className="wrapper">
@@ -119,7 +121,7 @@ export default function Orders() {
                       href="javascript:;"
                       data-id="8"
                       className=""
-                      onclick="ClickTabFillter(this)"
+                      onClick={() => handleFilterChange(ORDER_STATUS.SHIPPING)}
                     >
                       Đang giao hàng
                     </a>
@@ -143,7 +145,7 @@ export default function Orders() {
                 </div>
               </div>
               <div className="list" id="list_order">
-                <OrderItem orders={orders} reload={reloadOrder}/>
+                <OrderItem orders={orders} reload={reloadOrder} />
               </div>
             </div>
           </section>

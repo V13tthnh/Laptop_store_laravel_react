@@ -4,18 +4,15 @@ import Footer from "../../components/layout/Footer";
 import Header from "../../components/layout/Header/Header";
 import "../CheckoutPage/CheckoutPage.css";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function CheckoutPage() {
   const cartItems = useSelector((state) => state.cart.items);
-  const navigate = useNavigate();
-
-  if (cartItems.length === 0) {
-    navigate("/");
-  }
 
   return (
     <>
+      <ToastContainer />
       <Header />
       <Checkout carts={cartItems} />
       <Footer />

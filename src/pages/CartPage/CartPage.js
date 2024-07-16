@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import CartRow from "../../components/cart/CartRow";
 import CartEmpty from "../../components/cart/CartEmpty";
 import { clearCart } from "../../redux/slices/CartSlice";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { NavLink, useNavigate } from "react-router-dom";
 import { setTotal } from "../../redux/slices/CartSlice";
@@ -15,6 +15,7 @@ import useAuthContext from "../../context/AuthContext";
 import CartDiscount from "../../components/cart/CartDiscount";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHome } from "@fortawesome/free-solid-svg-icons";
+import { showFailedAlert, showSuccessAlert } from "../../utils/toastify";
 
 export default function CartPage() {
   const { token, user } = useAuthContext();
@@ -24,19 +25,9 @@ export default function CartPage() {
   const coupon = useSelector((state) => state.coupon.items);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!token) {
-      navigate("/login");
-      setTimeout(() => {
-        toast.error("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại");
-      }, 1000);
-      return;
-    }
-  }, [token]);
-
   const handleClearCart = () => {
     dispatch(clearCart());
-    toast.success(`Đã xóa giỏ hàng.`);
+    showSuccessAlert("Đã xóa giỏ hàng")
   };
 
   const parseToNumber = (num) => {
@@ -107,7 +98,7 @@ export default function CartPage() {
 
   const checkIsLogin = () => {
     if (!token || !user) {
-      toast.error("Bạn cần đăng nhập để thực hiện chức năng này.");
+      showFailedAlert("Vui lòng đăng nhập lại.");
       navigate("/login");
       return;
     }
@@ -357,7 +348,7 @@ export default function CartPage() {
                   <div className="css-127zbo8">
                     <div className="card-header-cart css-0">
                       <div className="css-1knbux5">
-                        <h6>Khuyến mãi</h6>
+                        <h6>Mã giảm giá</h6>
                         <CouponModal total={getTotal()} />
                       </div>
                     </div>
@@ -365,8 +356,8 @@ export default function CartPage() {
                       {!coupon ? (
                         <>
                           <div className="css-twos5s">
-                            Đơn hàng chưa có khuyến mãi nào, vui lòng chọn nhập
-                            hoặc chọn khuyến mãi để nhận thêm nhiều ưu đãi từ
+                            Đơn hàng chưa có Mã giảm giá nào, vui lòng nhập
+                            hoặc chọn Mã giảm giá để nhận thêm nhiều ưu đãi từ
                             chúng tôi.
                           </div>
                         </>
@@ -399,20 +390,7 @@ export default function CartPage() {
                                     {formatCurrency(calculateTotal(cartItems))}
                                   </td>
                                 </tr>
-                                <tr>
-                                  <td color="#848788" className="css-13izjcd">
-                                    <div className="css-99sejg">
-                                      Phí vận chuyển &nbsp;
-                                      <div className="css-1777v"></div>
-                                    </div>
-                                  </td>
-                                  <td
-                                    data-att-label="Phí vận chuyển"
-                                    className="css-fsu5pb"
-                                  >
-                                    Miễn phí
-                                  </td>
-                                </tr>
+                          
 
                                 {coupon && (
                                   <>

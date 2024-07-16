@@ -19,7 +19,7 @@ export default function Review({ data }) {
     fetchReview();
   }, []);
 
-  console.log(reviews);
+  // console.log(reviews);
 
   const getTotalReview = async () => {
     try {

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { NavLink } from "react-router-dom";
 import { Suspense } from "react";
+import { showFailedAlert } from "../../utils/toastify";
 
 const responsive = {
   largeDesktop: {
@@ -41,14 +42,14 @@ export default function Banner() {
       if (error.response && error.response.data && error.response.data.errors) {
         console.log(error.response.data.errors);
       } else {
-        toast.error(error.response.data.message);
+        showFailedAlert(error.response.data.message);
       }
     }
   };
 
   return (
     <>
-      <section className="slider" style={{ marginLeft: "320px" }}>
+      <section className="slider" style={{ marginLeft: "140px" }}>
         <div className="container">
           <div className="row">
             <div className="col-lg-12 col-md-12">

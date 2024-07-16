@@ -6,9 +6,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHome } from "@fortawesome/free-solid-svg-icons";
 import ListProductCompare from "../../components/compare/ListPoductCompare";
 import { useDispatch, useSelector } from "react-redux";
-import { toast, ToastContainer } from "react-toastify";
 import { addToCart } from "../../redux/slices/CartSlice";
 import { useEffect, useState } from "react";
+import { showSuccessAlert } from "../../utils/toastify";
+import { ToastContainer } from "react-toastify";
 
 export default function ComparePage() {
   const products = useSelector((state) => state.compare.items);
@@ -44,7 +45,9 @@ export default function ComparePage() {
         id: product.id,
         name: product.name,
         slug: product.slug,
-        image: `http://localhost:8000/${product.images[0]?.url}`,
+        image: product.first_image
+          ? `http://localhost:8000/${product.first_image?.url}`
+          : `http://localhost:8000/${product.images[0]?.url}`,
         product_specification_detail: product.product_specification_details,
         quantity: 1,
         unit_price: product.unit_price,
@@ -52,7 +55,7 @@ export default function ComparePage() {
         availableQuantity: product.quantity,
       })
     );
-    successNotify(`Đã thêm sản phẩm vào giỏ hàng.`);
+    showSuccessAlert("Đã thêm sản phẩm vào giỏ hàng.");
   };
 
   const handleCheckboxChange = () => {
@@ -71,35 +74,10 @@ export default function ComparePage() {
     return !(value1 === value2 && value2 === value3);
   };
 
-  const successNotify = (message) => {
-    toast.success(message, {
-      position: "top-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-      transition: "Bounce",
-    });
-  };
-
   return (
     <>
+    <ToastContainer/>
       <Header />
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
       <div class="breadcrumb-content" style={{ marginLeft: "320px" }}>
         <ul>
           <li>
@@ -120,7 +98,6 @@ export default function ComparePage() {
           showDifferencesOnChange={handleCheckboxChange}
           showDifferencesCheck={showDifferences}
         />
-
         {/* SO SÁNH NHANH */}
         <div className="box-detailcp overview">
           <div className="titleoverview">

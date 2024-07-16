@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { clearCart } from "../../redux/slices/CartSlice";
 import useAuthContext from "../../context/AuthContext";
 import { clearCoupon } from "../../redux/slices/CouponSlice";
+import { showSuccessAlert } from "../../utils/toastify";
 
 export default function VnPayCallback() {
   const params = useLocation();
@@ -28,10 +29,10 @@ export default function VnPayCallback() {
           if (res.data.success) {
             dispatch(clearCart());
             dispatch(clearCoupon());
-            toast.success("Cảm ơn bạn đã mua hàng.");
+            showSuccessAlert("Thanh toán thành công, cảm ơn bạn đã mua hàng.");
             setTimeout(() => {
-              navigate("/account/orders");
-            }, 3000);
+              navigate(`/bill/order/${res.data.order_id}`);
+            }, 1200);
           }
         })
         .catch((error) => console.log(error));

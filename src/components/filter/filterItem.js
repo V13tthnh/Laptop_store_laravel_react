@@ -1,11 +1,10 @@
 import { Button, Pagination, Stack } from "@mui/material";
-import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../../redux/slices/CartSlice";
 import { addToWishList } from "../../redux/slices/WishListSlice";
 import useAuthContext from "../../context/AuthContext";
-import { ToastContainer } from "react-toastify";
 import { NavLink } from "react-router-dom";
+import { showSuccessAlert } from "../../utils/toastify";
 
 const BASE_URL = "http://127.0.0.1:8000/";
 
@@ -33,7 +32,7 @@ export default function FilterItem({ data }) {
         availableQuantity: data.quantity,
       })
     );
-    successNotify(`Đã thêm sản phẩm vào giỏ hàng.`);
+    showSuccessAlert("Đã thêm sản phẩm vào giỏ hàng.");
   };
 
   const handleAddToWishlist = (data) => {
@@ -51,25 +50,11 @@ export default function FilterItem({ data }) {
         availableQuantity: data.quantity,
       })
     );
-    successNotify(`Đã thêm vào danh sách yêu thích`);
+    showSuccessAlert("Đã thêm vào danh sách yêu thích.");
   };
 
-  const successNotify = (message) => {
-    toast.success(message, {
-      position: "top-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-      transition: "Bounce",
-    });
-  };
   return (
     <>
-      <ToastContainer />
       <div className="proloop" id="viewed-loop-1">
         <div className="proloop-block">
           <div className="proloop-img">

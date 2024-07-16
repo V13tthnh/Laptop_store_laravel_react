@@ -3,7 +3,6 @@ import CouponModal from "../coupon/CouponModal";
 export default function CheckoutDiscount() {
   return (
     <>
-      {" "}
       <div className="css-1jwz5v4">
         <div className="card-header-checkout css-0">
           <div direction="row" className="css-qonqnt">

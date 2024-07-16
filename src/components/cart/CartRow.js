@@ -11,7 +11,7 @@ export default function CartRow(props) {
   const coupon = useSelector((state) => state.coupon.items);
   const dispatch = useDispatch();
 
-  useEffect(()=>{
+  useEffect(() => {
     let total = calculateTotal(cartItems);
     if (coupon) {
       if (total < coupon.minimum_spend) {
@@ -25,7 +25,7 @@ export default function CartRow(props) {
       return num;
     }
     if (typeof num === "string") {
-      const numberStr = num.replace(/\./g, "").replace(" vnđ", "");
+      const numberStr = num.replace(/\./g, "").replace("đ", "");
       const number = parseFloat(numberStr);
       return number;
     }
@@ -39,11 +39,29 @@ export default function CartRow(props) {
   };
 
   const formatCurrency = (total) => {
-    return total.toLocaleString("vi-VN") + " vnđ";
+    return total.toLocaleString("vi-VN") + "đ";
   };
 
   const lineItemTotals =
     parseInt(quantity) * parseToNumber(props.carts.unit_price);
+
+  const handleChange = (e) => {
+    let value = parseInt(e.target.value, 10);
+    if (isNaN(value)) {
+      value = 1; // Nếu giá trị không hợp lệ, thiết lập mặc định là 1
+    } else if (value < 1) {
+      value = 1; // Giá trị không thể nhỏ hơn 1
+    } else if (value > props.carts.availableQuantity) {
+      value = props.carts.availableQuantity; // Giá trị không thể lớn hơn validQuantity
+    }
+    dispatch(
+      updateQuantity({
+        id: props.carts.id,
+        quantity: value,
+        availableQuantity: props.carts.availableQuantity,
+      })
+    );
+  };
 
   const handleQuantityChange = (newQuantity) => {
     if (newQuantity >= 1 && newQuantity <= props.carts.availableQuantity) {
@@ -122,11 +140,6 @@ export default function CartRow(props) {
                       {props.carts.unit_price}
                     </span>
                   </div>
-                  {/* <div className="teko-row teko-row-end teko-row-middle css-1qrgscw">
-                    <span className="product-price__listed-price att-strike-through-display-price css-10zxjrh">
-                      29.990.000₫
-                    </span>
-                  </div> */}
                 </div>
               </div>
               <div className="teko-col teko-col-2 css-17ajfcv">
@@ -165,14 +178,18 @@ export default function CartRow(props) {
                         <div className="rc-input-number">
                           <div className="rc-input-number-input-wrap">
                             <input
+                              type="number"
                               autocomplete="off"
                               role="spinbutton"
-                              aria-valuemin="1"
-                              aria-valuemax="999"
-                              aria-valuenow="1"
                               step="1"
                               className="rc-input-number-input"
+                              onChange={handleChange}
                               value={props.carts.quantity}
+                              max={props.carts.validQuantity}
+                              style={{
+                                WebkitAppearance: "none",
+                                MozAppearance: "textfield", 
+                              }}
                             />
                           </div>
                         </div>

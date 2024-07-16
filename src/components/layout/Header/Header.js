@@ -5,7 +5,7 @@ import HeaderTop from "./HeaderTop";
 export default function Header() {
   return (
     <>
-      <header>
+      <header className="header">
         <HeaderTop></HeaderTop>
         <HeaderMiddle></HeaderMiddle>
         <HeaderBottom></HeaderBottom>

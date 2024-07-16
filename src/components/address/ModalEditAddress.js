@@ -6,9 +6,7 @@ import {
   DialogContent,
   DialogContentText,
   Box,
-  Checkbox,
   FormControl,
-  FormControlLabel,
   InputLabel,
   MenuItem,
   Select,
@@ -23,7 +21,7 @@ import {
 } from "../../api/address";
 import "react-toastify/dist/ReactToastify.css";
 import useAuthContext from "../../context/AuthContext";
-import { ToastContainer } from "react-toastify";
+import { showFailedAlert, showSuccessAlert } from "../../utils/toastify";
 
 export default function ModalEditAddress({ data, onReload }) {
   const [open, setOpen] = useState(false);
@@ -40,7 +38,8 @@ export default function ModalEditAddress({ data, onReload }) {
   const [addressDetail, setAddressDetail] = useState(data.address_detail);
   const [errors, setErrors] = useState("");
   const { token, user } = useAuthContext();
-  console.log(data);
+  const [phoneError, setPhoneError] = useState("");
+
   useEffect(() => {
     loadProvinces();
     if (provinces) {
@@ -83,8 +82,16 @@ export default function ModalEditAddress({ data, onReload }) {
     setProvincesId(event.target.value);
   };
 
-  const handlePhoneChange = (event) => {
-    setPhone(event.target.value);
+  const handlePhoneChange = (e) => {
+    const value = e.target.value;
+    if (value.trim() === "") {
+      setPhoneError("");
+    } else if (!/^0[0-9]{9}$/.test(value)) {
+      setPhoneError("Số điện thoại không hợp lệ (bắt đầu bằng 0 và gồm 10 số)");
+    } else {
+      setPhoneError("");
+    }
+    setPhone(value);
   };
 
   const handleFullNameChange = (event) => {
@@ -124,6 +131,10 @@ export default function ModalEditAddress({ data, onReload }) {
   };
 
   const handleAddAddress = async () => {
+    if (phoneError) {
+      showFailedAlert("Vui lòng nhập thông tin đúng định dạng.");
+      return;
+    }
     let newAddress = {
       full_name: fullName,
       phone: phone,
@@ -138,7 +149,8 @@ export default function ModalEditAddress({ data, onReload }) {
       await updateAddress(data.id, newAddress);
       resetForm();
       setOpen(false);
-      onReload("Đã cập nhật địa chỉ.");
+      onReload();
+      showSuccessAlert("Đã cập nhật địa chỉ.");
     } catch (error) {
       if (error.response && error.response.data && error.response.data.errors) {
         setErrors(error.response.data.errors);
@@ -150,18 +162,6 @@ export default function ModalEditAddress({ data, onReload }) {
 
   return (
     <>
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
       <Button onClick={handleClickOpen} className="button add-new-address">
         Cập nhật
       </Button>
@@ -221,13 +221,20 @@ export default function ModalEditAddress({ data, onReload }) {
                           <TextField
                             id="outlined-multiline-flexible"
                             label="Số điện thoại"
+                            type="number"
                             maxRows={12}
                             value={phone}
                             onChange={handlePhoneChange}
                           />
                         </div>
-                        {errors.phone && (
+                        {errors.phone ? (
                           <p style={{ color: "red" }}>{errors.phone}</p>
+                        ) : (
+                          phoneError && (
+                            <span style={{ color: "red", marginLeft: "10px" }}>
+                              {phoneError}
+                            </span>
+                          )
                         )}
                       </Box>
                     </div>

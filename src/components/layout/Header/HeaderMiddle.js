@@ -17,9 +17,9 @@ export default function HeaderMiddle() {
           <div className="row">
             <div className="col-lg-3">
               <div className="logo pb-sm-30 pb-xs-30">
-                <NavLink to="/">
+                <NavLink to="/" style={{textAlign: 'center'}}>
                   {/* <img src="/assets/images/logo3.png" alt="" style={{height:'100px', width: '100%'}}/> */}
-                  <b>THÀNH NGHĨA LAPTOP</b>
+                  <b style={{fontSize: '20px'}}>LAPTOP THÀNH NGHĨA</b>
                 </NavLink>
               </div>
             </div>

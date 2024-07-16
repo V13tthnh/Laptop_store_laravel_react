@@ -3,159 +3,288 @@ import Footer from "../../components/layout/Footer";
 import Header from "../../components/layout/Header/Header";
 import "../../pages/RegisterPage/RegisterPage.css";
 import { useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import useAuthContext from "../../context/AuthContext";
 import { ColorRing } from "react-loader-spinner";
 import LoadingPage from "../../components/common/LoadingPage";
+import { showFailedAlert } from "../../utils/toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
-  const { register, errors } = useAuthContext();
+  const { register, errors, setErrors } = useAuthContext();
+  const [formValues, setFormValues] = useState({
+    full_name: "",
+    email: "",
+    password: "",
+    password_confirmation: "",
+  });
+  const [formErrors, setFormErrors] = useState({});
+  const [serverError, setServerError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [showPasswordConfirmation, setShowPasswordConfirmation] =
-    useState(false);
-
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [passwordConfirmation, setPasswordConfirmation] = useState("");
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
   };
 
-  const toggleShowPasswordConfirmation = () => {
-    setShowPasswordConfirmation(!showPasswordConfirmation);
+  const toggleShowConfirmPassword = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
+
+  const validate = (name, value) => {
+    let errors = {};
+    if (name === "name" && !value) {
+      errors.full_name = "Vui lòng nhập tên người dùng.";
+    }
+    if (name === "email") {
+      if (!value) {
+        errors.email = "Vui lòng nhập email.";
+      } else {
+        const invalidEmailMessage = isInvalidEmail(value);
+        if (invalidEmailMessage) {
+          errors.email = invalidEmailMessage;
+        }
+      }
+    }
+
+    if (name === "password") {
+      if (!value) {
+        errors.password = "Vui lòng nhập mật khẩu.";
+      } else if (value.length < 8) {
+        errors.password = "Mật khẩu có ít nhất 8 ký tự.";
+      } else if (!/[A-Z]/.test(value)) {
+        errors.password = "Mật khẩu chứa ít nhất 1 ký tự hoa.";
+      } else if (!/[a-z]/.test(value)) {
+        errors.password = "Mật khẩu chứa ít nhất 1 ký tự thường.";
+      } else if (!/[0-9]/.test(value)) {
+        errors.password = "Mật khẩu phải có ít nhất 1 chữ số.";
+      } else if (!/[!@#$%^&*]/.test(value)) {
+        errors.password = "Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt.";
+      }
+    }
+
+    if (name === "password_confirmation") {
+      if (!value) {
+        errors.password_confirmation = "Vui lòng nhập xác nhận mật khẩu.";
+      } else if (value !== formValues.password) {
+        errors.password_confirmation = "Mật khẩu không trùng khớp.";
+      }
+    }
+    setFormErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: value ? errors[name] : "",
+    }));
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    const cleanedValue =
+      name === "password" || name === "password_confirmation"
+        ? value.replace(/\s+/g, "")
+        : value;
+
+    setFormValues({
+      ...formValues,
+      [name]: cleanedValue,
+    });
+    validate(name, cleanedValue);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    if (
-      name === null ||
-      email === null ||
-      password === null ||
-      passwordConfirmation === null
-    ) {
-      toast.error("Vui lòng nhập đầy đủ thông tin.");
+
+    const newErrors = {};
+    let hasErrors = false;
+    for (let name in formValues) {
+      validate(name, formValues[name]);
+      if (!formValues[name] || formErrors[name]) {
+        newErrors[name] = formErrors[name];
+        hasErrors = true;
+      }
+    }
+
+    setFormErrors(newErrors);
+
+    if (hasErrors) {
+      showFailedAlert(
+        "Có lỗi trong quá trình đăng ký, vui lòng kiểm tra kỹ thông tin."
+      );
       return;
     }
 
-    register({
-      full_name: name,
-      email,
-      password,
-      password_confirmation: passwordConfirmation,
-    });
-    setLoading(false);
-    resetForm();
-    if (!errors) {
-      resetForm();
+    try {
+      setLoading(true);
+      await register(formValues);
       setLoading(false);
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        setServerError(error.response.data.errors);
+      } else {
+        showFailedAlert(error.response.data.message);
+      }
     }
   };
 
-  if (loading) {
-    return <LoadingPage />;
-  }
+  const isInvalidEmail = (email) => {
+    const invalidCases = [
+      {
+        regex: /@/,
+        condition: (email) => email.split("@").length !== 2,
+        message: "Email phải chứa đúng một ký tự @",
+      },
+      {
+        regex: /^[^@]+$/,
+        condition: (email) => !/^[^@]+@[^@]+\.[^@]+$/.test(email),
+        message: "Email phải chứa đúng một ký tự @ và có dạng tên@miền",
+      },
+      {
+        regex: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+        condition: (email) =>
+          !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email),
+        message: "Email không hợp lệ.",
+      },
+      {
+        regex: /"/,
+        condition: (email) => {
+          const localPart = email.split("@")[0];
+          return /"/.test(localPart) && !/^"[^"]*"$/.test(localPart);
+        },
+        message: "Email không hợp lệ",
+      },
+      {
+        regex: /\\| /,
+        condition: (email) => {
+          const localPart = email.split("@")[0];
+          return /\\| /.test(localPart) && !/^"[^"]*"$/.test(localPart);
+        },
+        message:
+          "Khoảng trắng, dấu ngoặc kép và dấu gạch chéo phải nằm trong chuỗi ngoặc kép và phải có dấu gạch chéo trước đó",
+      },
+      {
+        regex: /.{65,}@/,
+        condition: (email) => email.split("@")[0].length > 64,
+        message: "Phần local-part không được dài hơn 64 ký tự",
+      },
+      {
+        regex: /_/,
+        condition: (email) => /@.*_/.test(email),
+        message: "Dấu gạch dưới không được phép xuất hiện trong phần miền",
+      },
+    ];
 
-  const resetForm = () => {
-    setName("");
-    setPassword("");
-    setEmail("");
-    setPasswordConfirmation("");
+    for (const caseCheck of invalidCases) {
+      if (caseCheck.regex.test(email) && caseCheck.condition(email)) {
+        return caseCheck.message;
+      }
+    }
+
+    return null;
   };
 
   return (
     <>
-      <Header />
       <ToastContainer />
+      <Header />
       <div class="container forms">
         <div className="form show-signup">
           <div className="form-content">
             <header className="form-header">Đăng ký</header>
-            <form action="#" className="show-signup" onSubmit={handleSubmit}>
-              {/* full_name */}
+
+            <form className="show-signup" onSubmit={handleSubmit}>
               <div
                 className={`field input-field ${
-                  errors && errors.full_name ? "invalid" : ""
+                  formErrors.full_name ? "invalid" : ""
                 }`}
               >
                 <input
                   type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  name="full_name"
+                  value={formValues.full_name}
+                  onChange={handleChange}
                   placeholder="Họ tên"
-                  className="input"
                 />
-                {errors && errors.full_name && (
-                  <div className="error">{errors.full_name[0]}</div>
+                {formErrors.full_name ? (
+                  <span className="text-danger">{formErrors.full_name}</span>
+                ) : (
+                  <span className="text-danger">{errors?.full_name}</span>
                 )}
               </div>
               {/* email */}
               <div
                 className={`field input-field ${
-                  errors && errors.email ? "invalid" : ""
+                  formErrors.email ? "invalid" : ""
                 }`}
               >
                 <input
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  name="email"
+                  value={formValues.email}
+                  onChange={handleChange}
                   placeholder="Email"
-                  className="input"
                 />
-                {errors && errors.email && (
-                  <div className="error">{errors.email[0]}</div>
+                {formErrors.email ? (
+                  <span className="text-danger">{formErrors.email}</span>
+                ) : (
+                  <span className="text-danger">{errors?.email}</span>
                 )}
               </div>
               {/* password */}
               <div
                 className={`field input-field ${
-                  errors && errors.password ? "invalid" : ""
+                  formErrors.password ? "invalid" : ""
                 }`}
               >
                 <input
                   type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  name="password"
+                  value={formValues.password}
+                  onChange={handleChange}
                   placeholder="Mật khẩu"
-                  className="password"
                 />
                 <i
+                  onClick={toggleShowPassword}
                   className={
                     showPassword ? "bx bx-show eye-icon" : "bx bx-hide eye-icon"
                   }
-                  onClick={toggleShowPassword}
                 ></i>
-                {errors && errors.password && (
-                  <p className="error">{errors.password[0]}</p>
+                {formErrors.password ? (
+                  <span className="text-danger">{formErrors.password}</span>
+                ) : (
+                  <span className="text-danger">{errors?.password}</span>
                 )}
               </div>
               {/* password_confirmation */}
               <div
-                className={`field input-field ${
-                  errors && errors.password_confirmation ? "invalid" : ""
+                className={`field input-field  ${
+                  formErrors.password_confirmation ? "invalid" : ""
                 }`}
               >
                 <input
-                  type={showPasswordConfirmation ? "text" : "password"}
-                  value={passwordConfirmation}
-                  onChange={(e) => setPasswordConfirmation(e.target.value)}
-                  placeholder="Nhập lại mật khẩu"
-                  className="password"
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="password_confirmation"
+                  value={formValues.password_confirmation}
+                  onChange={handleChange}
+                  placeholder="Xác nhận mật khẩu"
                 />
                 <i
+                  onClick={toggleShowConfirmPassword}
                   className={
-                    showPasswordConfirmation
+                    showConfirmPassword
                       ? "bx bx-show eye-icon"
                       : "bx bx-hide eye-icon"
                   }
-                  onClick={toggleShowPasswordConfirmation}
                 ></i>
-                {errors && errors.password_confirmation && (
-                  <p className="error">{errors.password_confirmation[0]}</p>
+                {formErrors.password_confirmation && (
+                  <span className="text-danger">
+                    {formErrors.password_confirmation}
+                  </span>
+                )}
+                {errors && (
+                  <span className="text-danger">
+                    {errors?.password_confirmation}
+                  </span>
                 )}
               </div>
               <div className="field button-field">
@@ -178,30 +307,13 @@ export default function RegisterPage() {
             </form>
             <div className="form-link">
               <span>
-                Bạn đã có tài khoản?{" "}
+                Bạn đã có tài khoản?
                 <NavLink to="/login" className="link login-link">
                   Đăng nhập
                 </NavLink>
               </span>
             </div>
           </div>
-          {/* <div className="form-line"></div>
-          <div className="media-options">
-            <a href="#" className="field facebook">
-              <i className="bx bxl-facebook facebook-icon"></i>
-              <span>Đăng nhập với Facebook</span>
-            </a>
-          </div>
-          <div className="media-options">
-            <a href="#" className="field google">
-              <img
-                src="../../assets/images/menu/logo/google.jpg"
-                alt=""
-                className="google-img"
-              />
-              <span>Đăng nhập với Google</span>
-            </a>
-          </div> */}
         </div>
       </div>
       <Footer />

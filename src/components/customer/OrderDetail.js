@@ -6,10 +6,11 @@ import { faCreditCard } from "@fortawesome/free-solid-svg-icons";
 import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { faShoppingBag } from "@fortawesome/free-solid-svg-icons";
 import useAuthContext from "../../context/AuthContext";
-import { ToastContainer, toast } from "react-toastify";
+
 import "react-toastify/dist/ReactToastify.css";
 import { getOrderDetail } from "../../api/order";
 import LoadingPage from "../common/LoadingPage";
+import { showFailedAlert } from "../../utils/toastify";
 
 const ORDER_STATUS = {
   1: "Chờ xử lý",
@@ -33,7 +34,7 @@ export default function OrderDetail() {
   useEffect(() => {
     if (!token && !user) {
       navigator("/login");
-      toast.error("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại");
+      showFailedAlert("Vui lòng đăng nhập lại");
       return;
     }
   }, [token]);
@@ -66,18 +67,6 @@ export default function OrderDetail() {
 
   return (
     <>
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
       <div className="page-section mb-60">
         <div className="container">
           <section className="wrapper">

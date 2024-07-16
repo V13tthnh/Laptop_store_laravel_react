@@ -1,15 +1,17 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import api from "../api/api";
-import { useLocation, useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
+import { showFailedAlert, showSuccessAlert } from "../utils/toastify";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   const [token, setToken] = useState(() => localStorage.getItem("token"));
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() =>
+    JSON.parse(localStorage.getItem("user"))
+  );
   const [errors, setErrors] = useState(null);
 
   useEffect(() => {
@@ -35,7 +37,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("token", token);
     setToken(token);
     api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    getUser(token);
+    await getUser(token);
     navigate("/");
   };
 
@@ -47,11 +49,12 @@ export const AuthProvider = ({ children }) => {
         },
       });
       setUser(response.data.data);
+      localStorage.setItem("user", JSON.stringify(response.data.data));
     } catch (error) {
       if (error.response && error.response.data && error.response.data.errors) {
         setErrors(error.response.data.errors);
       } else {
-        toast.error(error.response.data.message);
+        console.log(error.response.data.message);
       }
     }
   };
@@ -64,25 +67,37 @@ export const AuthProvider = ({ children }) => {
       setToken(token);
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       getUser(token);
-      navigate("/");
+      if (response.data.status) {
+        showSuccessAlert("Đăng nhập thành công.");
+        setErrors(null);
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 1300);
+      }
     } catch (error) {
       if (error.response && error.response.data && error.response.data.errors) {
         setErrors(error.response.data.errors);
       } else {
-        toast.error(error.response.data.message);
+        showFailedAlert(error.response.data.message);
       }
     }
   };
 
   const redirect = async (provider) => {
     try {
-      const response = await api.get(`auth/redirect/${provider}`);
-      window.location.href = response.data.url;
+      const response = await api.get(`/auth/redirect/${provider}`);
+      const { url } = response.data;
+
+      if (url) {
+        window.location.href = url;
+      } else {
+        showFailedAlert("Không thể chuyển hướng đến dịch vụ đăng nhập.");
+      }
     } catch (error) {
       if (error.response && error.response.data && error.response.data.errors) {
         setErrors(error.response.data.errors);
       } else {
-        toast.error(error.response.data.message);
+        showFailedAlert(error.response.data.message);
       }
     }
   };
@@ -101,7 +116,7 @@ export const AuthProvider = ({ children }) => {
       if (error.response && error.response.data && error.response.data.errors) {
         setErrors(error.response.data.errors);
       } else {
-        toast.error(error.response.data.message);
+        showFailedAlert(error.response.data.message);
       }
     }
   };
@@ -110,23 +125,35 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await api.post("/register", data);
       if (response.data.status) {
-        toast.success("Đăng ký thành công.");
+        setErrors(null);
+        showSuccessAlert("Đăng ký tài khoản thành công.");
+        setTimeout(() => navigate("/login"), 1300);
       }
     } catch (error) {
       if (error.response && error.response.data && error.response.data.errors) {
         setErrors(error.response.data.errors);
       } else {
-        toast.error(error.response.data.message);
+        showFailedAlert(error.response.data.message);
       }
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setToken(null);
-    setUser(null);
-    delete api.defaults.headers.common["Authorization"];
-    toast.success("Đã đăng xuất.");
+  const logout = async () => {
+    try {
+      await api.get("/logout");
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      setToken(null);
+      setUser(null);
+      delete api.defaults.headers.common["Authorization"];
+      showSuccessAlert("Đã đăng xuất.");
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        setErrors(error.response.data.errors);
+      } else {
+        showFailedAlert(error.response.data.message);
+      }
+    }
   };
 
   return (

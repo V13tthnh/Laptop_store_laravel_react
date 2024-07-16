@@ -1,17 +1,8 @@
 import { useEffect, useState } from "react";
 import useDebounce from "../../hooks/debounce";
-import axios from "axios";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import api from "../../api/api";
-import Box from "@mui/material/Box";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import Divider from "@mui/material/Divider";
-import ProductDropdown from "../common/ProductDropdown";
-import { toast } from "react-toastify";
+import { showFailedAlert } from "../../utils/toastify";
 
 export default function Searchbar() {
   const [loading, setLoading] = useState();
@@ -37,7 +28,7 @@ export default function Searchbar() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if(!search){
-      toast.error("Vui lòng nhập dữ liệu tìm kiếm.");
+      showFailedAlert("Vui lòng nhập dữ liệu tìm kiếm.");
       return;
     }
     navigate(`/laptop?search=${search}`);
@@ -56,7 +47,7 @@ export default function Searchbar() {
           <i className="fa fa-search"></i>
         </button>
       </form>
-      <ProductDropdown products={searchValue} show={search ? true : false} />
+      {/* <ProductDropdown products={searchValue} show={search ? true : false} /> */}
     </div>
     </>
   );

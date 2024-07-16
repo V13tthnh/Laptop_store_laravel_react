@@ -2,47 +2,97 @@ import { useEffect, useRef, useState } from "react";
 import Footer from "../../components/layout/Footer";
 import Header from "../../components/layout/Header/Header";
 import "../../pages/RegisterPage/RegisterPage.css";
-import { NavLink, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import api from "../../api/api";
-import { toast, ToastContainer } from "react-toastify";
 import LoadingPage from "../../components/common/LoadingPage";
+import { showFailedAlert, showSuccessAlert } from "../../utils/toastify";
 
 export default function ResetPasswordPage() {
   const [loading, setLoading] = useState();
   const [errors, setErrors] = useState();
   const { token } = useParams();
-  const newPassword = useRef();
-  const newPasswordConfirmation = useRef();
+  const [newPassword, setNewPassword] = useState("");
+  const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
+  const [newPasswordError, setNewPasswordError] = useState("");
+  const [newPasswordConfirmError, setNewPasswordConfirmError] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showNewPasswordConfirm, setShowNewPasswordConfirm] = useState(false);
   const navigator = useNavigate();
-  console.log(errors);
+
+  const validatePassword = (newPassword) => {
+    if (!newPassword) {
+      return "Vui lòng nhập mật khẩu";
+    } else if (
+      !/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,35}/.test(newPassword)
+    ) {
+      return "Mật khẩu phải có ít nhất 8 ký tự bao gồm chữ thường, chữ hoa, số và ký tự đặc biệt";
+    }
+    return "";
+  };
+
+  const validateConfirmPassword = (newPasswordConfirm) => {
+    if (newPasswordConfirm !== newPassword) {
+      return "Xác nhận mật khẩu không khớp";
+    }
+    return "";
+  };
+
+  const newPasswordToggle = () => {
+    setShowNewPassword(!showNewPassword);
+  };
+
+  const newPasswordConfirmToggle = () => {
+    setShowNewPasswordConfirm(!showNewPasswordConfirm);
+  };
+
+  const handleChangeNewPassword = (event) => {
+    const value = event.target.value;
+    setNewPassword(value);
+    setNewPasswordError(validatePassword(value));
+  };
+
+  const handleChangeNewPasswordConfirm = (event) => {
+    const value = event.target.value;
+    setNewPasswordConfirm(value);
+    setNewPasswordConfirmError(validateConfirmPassword(value));
+  };
+
+  console.log(newPassword);
+  console.log(newPasswordConfirm);
   const handleResetPassword = async (event) => {
     event.preventDefault();
-    if (!newPassword.current.value || !newPasswordConfirmation.current.value) {
-      toast.error("Vui lòng nhập đầy đủ thông tin.");
+    const newPasswordError = validatePassword(newPassword);
+    const confirmPasswordError = validateConfirmPassword(newPasswordConfirm);
+
+    if (newPasswordError || confirmPasswordError) {
+      setNewPasswordError(newPasswordError);
+      setNewPasswordConfirmError(confirmPasswordError);
+      showFailedAlert("Vui lòng xem kỹ thông tin.");
       return;
     }
+
     try {
       const response = await api.post("/reset-password", {
-        new_password: newPassword.current.value,
-        new_password_confirmation: newPasswordConfirmation.current.value,
+        new_password: newPassword,
+        new_password_confirmation: newPasswordConfirm,
         token: token,
       });
       setLoading(true);
       if (response.data.status) {
-        toast.success(response.data.message);
+        showSuccessAlert(response.data.message);
         setLoading(false);
         setTimeout(() => {
           navigator("/login");
         }, 2000);
       } else {
-        toast.error(response.data.message);
+        showFailedAlert(response.data.message);
         setLoading(false);
       }
     } catch (error) {
       if (error.response && error.response.data && error.response.data.errors) {
         setErrors(error.response.data.errors);
       } else {
-        toast.error(error.response.data.message);
+        showFailedAlert(error.response.data.message);
       }
     }
   };
@@ -58,7 +108,6 @@ export default function ResetPasswordPage() {
   return (
     <>
       <Header />
-      <ToastContainer />
       <div class="container forms">
         <div className="form show-signup">
           <div className="form-content">
@@ -66,25 +115,51 @@ export default function ResetPasswordPage() {
             <form action="#" className="show-signup">
               <div className="field input-field">
                 <input
-                  type="password"
-                  placeholder="Mật khẩu"
+                  type={showNewPassword ? "text" : "password"}
+                  placeholder="Nhập mật khẩu mới"
                   className="password"
-                  ref={newPassword}
+                  value={newPassword}
+                  onChange={handleChangeNewPassword}
                 />
+                <i
+                  className={
+                    showNewPassword
+                      ? "bx bx-show eye-icon"
+                      : "bx bx-hide eye-icon"
+                  }
+                  onClick={newPasswordToggle}
+                ></i>
+
                 {errors && errors.new_password && (
                   <div className="error">{errors.new_password[0]}</div>
+                )}
+                {newPasswordError && (
+                  <div style={{ color: "red" }}>{newPasswordError}</div>
                 )}
               </div>
               <div className="field input-field">
                 <input
-                  type="password"
-                  placeholder="Nhập mật khẩu mới"
+                  type={showNewPasswordConfirm ? "text" : "password"}
+                  placeholder="Xác nhận mật khẩu mới"
                   className="password"
-                  ref={newPasswordConfirmation}
+                  value={newPasswordConfirm}
+                  onChange={handleChangeNewPasswordConfirm}
                 />
-                <i className="bx bx-hide eye-icon"></i>
+                <i
+                  className={
+                    showNewPasswordConfirm
+                      ? "bx bx-show eye-icon"
+                      : "bx bx-hide eye-icon"
+                  }
+                  onClick={newPasswordConfirmToggle}
+                ></i>
                 {errors && errors.new_password_confirmation && (
-                  <div className="error">{errors.new_password_confirmation[0]}</div>
+                  <div className="error">
+                    {errors.new_password_confirmation[0]}
+                  </div>
+                )}
+                {newPasswordConfirmError && (
+                  <div style={{ color: "red" }}>{newPasswordConfirmError}</div>
                 )}
               </div>
               <div className="field button-field">

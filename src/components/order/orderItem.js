@@ -1,11 +1,9 @@
 import { NavLink } from "react-router-dom";
 import useAuthContext from "../../context/AuthContext";
 import { Button } from "@mui/material";
-import OrderDeleteModal from "./OrderDeleteModal";
-import api from "../../api/api";
 import { useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
 import { cancelOrder, reOrder } from "../../api/order";
+import { showSuccessAlert } from "../../utils/toastify";
 
 export default function OrderItem({ orders, reload }) {
   const { token, user } = useAuthContext();
@@ -23,10 +21,13 @@ export default function OrderItem({ orders, reload }) {
   const handleCancelOrder = async (id) => {
     try {
       await cancelOrder({ order_id: id });
+      setTimeout(() => {
+        showSuccessAlert("Đã hủy hóa đơn.");
+      }, 3000);
     } catch (error) {
       console.error("Failed to load addresses:", error);
     } finally {
-      toast.success("Đơn hàng đã được hủy thành công.");
+      showSuccessAlert("Đơn hàng đã được hủy thành công.");
       reload();
       setLoading(false);
     }
@@ -35,14 +36,16 @@ export default function OrderItem({ orders, reload }) {
   const handleReOrder = async (id) => {
     try {
       const response = await reOrder({ order_id: id });
+      setTimeout(() => {
+        showSuccessAlert("Đã đặt lại hóa đơn.");
+      }, 3000);
       if (response.data.status) {
-        toast.success(response.data.message);
         reload();
       }
     } catch (error) {
       console.error("Failed to load addresses:", error);
     } finally {
-      toast.success("Đơn hàng đã được mua lại.");
+      showSuccessAlert("Đơn hàng đã được mua lại.");
       reload();
       setLoading(false);
     }
@@ -50,7 +53,6 @@ export default function OrderItem({ orders, reload }) {
 
   return (
     <>
-      <ToastContainer />
       {orders &&
         orders.map((order) => {
           return (
@@ -62,7 +64,15 @@ export default function OrderItem({ orders, reload }) {
                       <b>Đơn hàng:</b>&nbsp;<span>#{order.id} </span>
                     </div>
                   </div>
-                  <b className="success order-status" data-status="Success" style={order.status === 5 ? { color: 'rgba(40, 199, 111, 0.7)' } : {}}>
+                  <b
+                    className="success order-status"
+                    data-status="Success"
+                    style={
+                      order.status === 5
+                        ? { color: "rgba(40, 199, 111, 0.7)" }
+                        : {}
+                    }
+                  >
                     {ORDER_STATUS[order.status]}
                   </b>
                 </div>
@@ -114,7 +124,7 @@ export default function OrderItem({ orders, reload }) {
                     >
                       Xem chi tiết
                     </NavLink>
-                    {order.status === 1 &&  order.formality !== 1 && (
+                    {order.status === 1 && order.formality !== 1 && (
                       <Button
                         size="small"
                         variant="outlined"

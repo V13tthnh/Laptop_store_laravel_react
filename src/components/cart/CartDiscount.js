@@ -9,14 +9,14 @@ export default function CartDiscount() {
   const handleRemoveClick = () => {
     dispatch(clearCoupon(coupon.code));
   };
-  console.log(coupon);
+
   return (
     <>
       {coupon && (
         <>
           <div className="teko-row teko-row-start css-1k740n1">
             <div type="subtitle" color="textSecondary" className="css-1y5a3it">
-              KHUYẾN MÃI ĐÃ ÁP DỤNG
+              MÃ ĐÃ ÁP DỤNG
             </div>
             <div style={{ width: "100%" }} className="css-1p7ma5o">
               <div className="teko-row teko-row-no-wrap teko-row-space-between css-1qrgscw">

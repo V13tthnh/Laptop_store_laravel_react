@@ -19,17 +19,7 @@ export default function LeftSidebar(props) {
   return (
     <>
       <div className="menuleft">
-        <div className="menuleft__name">
-          <h2>
-            {user && token ? (
-              <>
-                {user.gender === "Nam" ? "Anh" : "Chị"} <b>{user?.full_name}</b>
-              </>
-            ) : (
-              <>Anh Nguyễn Văn A</>
-            )}
-          </h2>
-        </div>
+        <div className="menuleft__name"></div>
         <ul>
           <li className="active">
             <NavLink to="/account/profile">

@@ -5,9 +5,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import LoadingPage from "../../components/common/LoadingPage";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { showSuccessAlert } from "../../utils/toastify";
 
 export default function GoogleCallback() {
-  const { handleSetToken } = useAuthContext();
+  const { handleSetToken, getUser } = useAuthContext();
   const [loading, setLoading] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -29,7 +30,12 @@ export default function GoogleCallback() {
           const { token } = response.data;
           localStorage.setItem("token", token);
           handleSetToken(token);
-          navigate("/");
+          api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+          showSuccessAlert("Bạn vừa đăng nhập bằng tài khoản google.");
+          getUser(token);
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 2200);
         }
       } catch (error) {
         console.log(error);

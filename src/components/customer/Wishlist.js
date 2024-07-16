@@ -1,13 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import LeftSidebar from "./LeftSidebar";
 import { NavLink, useNavigate } from "react-router-dom";
 import useAuthContext from "../../context/AuthContext";
 import { useDispatch, useSelector } from "react-redux";
-import Technical from "../product/Technical";
 import { Button, Stack } from "@mui/material";
 import { addToCart } from "../../redux/slices/CartSlice";
 import { removeFromWishList } from "../../redux/slices/WishListSlice";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { showFailedAlert, showSuccessAlert } from "../../utils/toastify";
 
 export default function Wishlist() {
   const dispatch = useDispatch();
@@ -18,53 +19,43 @@ export default function Wishlist() {
   useEffect(() => {
     if (!token && !user) {
       navigate("/login");
-      toast.error("Đã hết phiên đăng nhập, vui lòng đăng nhập lại.");
+      showFailedAlert("Vui lòng đăng nhập lại");
       return;
     }
   }, [token]);
-
+  
   //Thêm vào giỏ hàng
   const handleAddToCart = (product) => {
+    console.log(product);
     dispatch(
       addToCart({
         id: product.id,
         name: product.name,
         slug: product.slug,
-        image: `http://localhost:8000/${product.image}`,
+        image: product.image,
         product_specification_detail: product.product_specification_details,
         quantity: 1,
         unit_price: product.unit_price,
         sale_price: product.sale_price,
-        availableQuantity: product.quantity,
+        availableQuantity: product.availableQuantity,
       })
     );
 
     successNotify(`Đã thêm sản phẩm vào giỏ hàng.`);
   };
-
+  
   const handleRemoveFromWishlist = (id) => {
     dispatch(removeFromWishList({ id }));
-    successNotify(`Đã xóa khỏi danh sách yêu thích`);
+    showSuccessAlert("Đã xóa khỏi danh sách yêu thích.");
   };
 
   const successNotify = (message) => {
-    toast.success(message);
+    showSuccessAlert(message);
   };
 
   return (
     <>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
+      <ToastContainer />
       <div className="page-section mb-60">
         <div className="container">
           <section className="wrapper">

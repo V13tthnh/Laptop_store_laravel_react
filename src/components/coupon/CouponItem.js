@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { applyCoupon, clearCoupon } from "../../redux/slices/CouponSlice";
-import { toast, ToastContainer } from "react-toastify";
+
 import { Button } from "@mui/material";
 
 export default function CouponItem({ data, closeModal }) {
@@ -27,7 +27,6 @@ export default function CouponItem({ data, closeModal }) {
 
   return (
     <>
-      <ToastContainer />
       <div width="100%" className="css-aw1phq" d>
         <div className="teko-row teko-row-no-wrap teko-row-space-between css-1qrgscw">
           <div className="teko-col css-1kuu3ui">
@@ -64,10 +63,10 @@ export default function CouponItem({ data, closeModal }) {
                     color="primary600"
                     className="css-1fktfn4"
                   >
-                    {data.code}
+                    {data.code ? data.code : data?.[1]?.code}
                   </div>
                 </span>
-                {data.description}
+                {data.description ? data.description : data?.[1]?.description}
               </div>
               <div
                 type="caption"
@@ -82,7 +81,7 @@ export default function CouponItem({ data, closeModal }) {
                   color="textSecondary"
                   className="css-1f5a6jh"
                 >
-                  HSD: {data.end_date}
+                  HSD: {data.end_date ? data.end_date : data?.[1]?.end_date}
                 </div>
               </div>
 

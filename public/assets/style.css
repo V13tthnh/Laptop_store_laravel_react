@@ -58,22 +58,27 @@
 	font-family: 'Poppins', sans-serif;
 	font-family: 'Rubik', sans-serif;
 */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
 
 body {
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
 }
 
 /* Áp dụng font cho các phần tử khác */
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Roboto', sans-serif;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Roboto", sans-serif;
 }
 
 p {
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
 }
-a{
-  font-family: 'Roboto', sans-serif;
+a {
+  font-family: "Roboto", sans-serif;
 }
 
 .ck-editor {
@@ -106,7 +111,7 @@ a{
   padding: 10px 5px;
   text-align: center;
 }
-.loading-page{
+.loading-page {
   position: fixed;
   z-index: 999;
   height: 2em;
@@ -119,14 +124,14 @@ a{
   right: 0;
 }
 .loading-page:before {
-  content: '';
+  content: "";
   display: block;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.3);
+  background-color: rgba(0, 0, 0, 0.3);
 }
 .loading-page:not(:required) {
   /* hide "loading..." text */
@@ -137,7 +142,7 @@ a{
   border: 0;
 }
 .loading-page:not(:required):after {
-  content: '';
+  content: "";
   display: block;
   font-size: 10px;
   width: 1em;
@@ -149,8 +154,16 @@ a{
   -o-animation: spinner 1500ms infinite linear;
   animation: spinner 1500ms infinite linear;
   border-radius: 0.5em;
-  -webkit-box-shadow: rgba(0, 0, 0, 0.75) 1.5em 0 0 0, rgba(0, 0, 0, 0.75) 1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) 0 1.5em 0 0, rgba(0, 0, 0, 0.75) -1.1em 1.1em 0 0, rgba(0, 0, 0, 0.5) -1.5em 0 0 0, rgba(0, 0, 0, 0.5) -1.1em -1.1em 0 0, rgba(0, 0, 0, 0.75) 0 -1.5em 0 0, rgba(0, 0, 0, 0.75) 1.1em -1.1em 0 0;
-  box-shadow: rgba(0, 0, 0, 0.75) 1.5em 0 0 0, rgba(0, 0, 0, 0.75) 1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) 0 1.5em 0 0, rgba(0, 0, 0, 0.75) -1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) -1.5em 0 0 0, rgba(0, 0, 0, 0.75) -1.1em -1.1em 0 0, rgba(0, 0, 0, 0.75) 0 -1.5em 0 0, rgba(0, 0, 0, 0.75) 1.1em -1.1em 0 0;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.75) 1.5em 0 0 0,
+    rgba(0, 0, 0, 0.75) 1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) 0 1.5em 0 0,
+    rgba(0, 0, 0, 0.75) -1.1em 1.1em 0 0, rgba(0, 0, 0, 0.5) -1.5em 0 0 0,
+    rgba(0, 0, 0, 0.5) -1.1em -1.1em 0 0, rgba(0, 0, 0, 0.75) 0 -1.5em 0 0,
+    rgba(0, 0, 0, 0.75) 1.1em -1.1em 0 0;
+  box-shadow: rgba(0, 0, 0, 0.75) 1.5em 0 0 0,
+    rgba(0, 0, 0, 0.75) 1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) 0 1.5em 0 0,
+    rgba(0, 0, 0, 0.75) -1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) -1.5em 0 0 0,
+    rgba(0, 0, 0, 0.75) -1.1em -1.1em 0 0, rgba(0, 0, 0, 0.75) 0 -1.5em 0 0,
+    rgba(0, 0, 0, 0.75) 1.1em -1.1em 0 0;
 }
 
 @-webkit-keyframes spinner {
@@ -218,7 +231,7 @@ a{
   }
 }
 
-.search-bar-container{
+.search-bar-container {
   display: flex;
   position: relative;
   background: #fff;
@@ -229,13 +242,13 @@ a{
   float: left;
 }
 
-.input-wrapper{
+.input-wrapper {
   background-color: white;
   width: 100%;
   height: 2.5rem;
   padding: 0 15px;
   box-shadow: 0px 0px 8px #ddd;
-  display:flex;
+  display: flex;
   align-items: center;
 }
 
@@ -252,7 +265,7 @@ body {
   background-color: transparent;
   color: #242424;
   background-color: #f8f8fc;
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   font-size: 14px;
   font-style: normal;
   font-weight: normal;
@@ -2192,7 +2205,6 @@ textarea:focus {
 .product-dropdown li:hover {
   background-color: #f0f0f0;
 }
-
 
 .hm-searchbox .nice-select.select-search-category {
   width: auto;
@@ -7465,12 +7477,12 @@ a#ss-now span label {
   pointer-events: auto;
   background-color: #fff;
   background-clip: padding-box;
-  border: 1px solid rgba(0, 0, 0, .2);
-  border-radius: .3rem;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 0.3rem;
   outline: 0;
 }
 .modal .modal-header {
-  border-bottom: 1px solid #CFCFCF;
+  border-bottom: 1px solid #cfcfcf;
   justify-content: space-between;
   align-items: center;
   padding: 24px;
@@ -7484,8 +7496,8 @@ a#ss-now span label {
   justify-content: space-between;
   padding: 1rem 1rem;
   border-bottom: 1px solid #dee2e6;
-  border-top-left-radius: calc(.3rem - 1px);
-  border-top-right-radius: calc(.3rem - 1px);
+  border-top-left-radius: calc(0.3rem - 1px);
+  border-top-right-radius: calc(0.3rem - 1px);
 }
 .modal .modal-header h4 {
   font-weight: 600;
@@ -7516,7 +7528,8 @@ a#ss-now span label {
 .modal.modal-account .box-popup-account {
   color: #535353;
 }
-.modal.modal-account .box-popup-account .box-popup-account-form .btn-recovery, .modal.modal-account .box-popup-account .box-popup-account-form .btn-cancel {
+.modal.modal-account .box-popup-account .box-popup-account-form .btn-recovery,
+.modal.modal-account .box-popup-account .box-popup-account-form .btn-cancel {
   font-style: italic;
   color: #535353;
   display: inline-block;
@@ -7530,23 +7543,24 @@ a#ss-now span label {
   font-size: 16px;
   font-weight: 600;
   color: #fff;
-  background: #E30019;
+  background: #e30019;
   border-radius: 4px;
   width: 100%;
   padding: 12px 16px;
 }
-.modal.modal-account .box-popup-account .box-popup-account-form .btn-recovery, .modal.modal-account .box-popup-account .box-popup-account-form .btn-cancel {
+.modal.modal-account .box-popup-account .box-popup-account-form .btn-recovery,
+.modal.modal-account .box-popup-account .box-popup-account-form .btn-cancel {
   font-style: italic;
   color: #535353;
   display: inline-block;
   margin-bottom: 16px;
 }
 
-
 @media (min-width: 992px) {
-    .form-control, .form__field {
-        font-size: 16px;
-    }
+  .form-control,
+  .form__field {
+    font-size: 16px;
+  }
 }
 .form__input-wrapper .form__floating-label {
   position: absolute;
@@ -7563,22 +7577,24 @@ a#ss-now span label {
   transition: transform 0.2s ease-in-out, -webkit-transform 0.2s ease-in-out;
   pointer-events: none;
 }
-.form-control, .form__field {
-    width: 100%;
-    height: 40px;
-    background: #FFFFFF;
-    color: var(--color-text);
-    border: 1px solid var(--color-line-border);
-    border-radius: 4px;
-    outline: none;
-    padding: 0 16px;
-    font-size: 14px;
-    font-weight: 400;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    outline: none !important;
-    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
+.form-control,
+.form__field {
+  width: 100%;
+  height: 40px;
+  background: #ffffff;
+  color: var(--color-text);
+  border: 1px solid var(--color-line-border);
+  border-radius: 4px;
+  outline: none;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 400;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  outline: none !important;
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out,
+    color 0.2s ease-in-out;
 }
 .modal.modal-account .box-popup-account .line {
   text-align: center;
@@ -7614,20 +7630,22 @@ a#ss-now span label {
   margin-bottom: 24px;
 }
 .modal.modal-account .box-popup-account .btn-social-list .btn-gg {
-  background: #DF4A32;
-  border-color: #DF4A32;
+  background: #df4a32;
+  border-color: #df4a32;
 }
-.modal.modal-account .box-popup-account .btn-social-list .btn-fb svg, .modal.modal-account .box-popup-account .btn-social-list .btn-gg svg {
+.modal.modal-account .box-popup-account .btn-social-list .btn-fb svg,
+.modal.modal-account .box-popup-account .btn-social-list .btn-gg svg {
   margin-right: 8px;
 }
 .modal.modal-account .box-popup-account .btn-social-list .button + button {
   margin-left: 8px;
 }
 .modal.modal-account .box-popup-account .btn-social-list .btn-fb {
-  background: #3B5998;
-  border-color: #3B5998;
+  background: #3b5998;
+  border-color: #3b5998;
 }
-.modal.modal-account .box-popup-account .btn-social-list .btn-fb, .modal.modal-account .box-popup-account .btn-social-list .btn-gg {
+.modal.modal-account .box-popup-account .btn-social-list .btn-fb,
+.modal.modal-account .box-popup-account .btn-social-list .btn-gg {
   width: 50%;
   height: 42px;
   color: #fff;
@@ -7638,3 +7656,72 @@ a#ss-now span label {
 /*----------------------------------------------------------------------------------------------------*/
 /*------------------------------------------> The End <-----------------------------------------------*/
 /*----------------------------------------------------------------------------------------------------*/
+.toast-container {
+  position: fixed;
+  top: 30px;
+  right: 30px;
+  background-color: #ffffff;
+  color: #333333;
+  border: 1px solid #cccccc;
+  padding: 10px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+}
+
+.toast-icon {
+  margin-right: 10px;
+}
+
+.success-toast {
+  background-color: #7fdb6a; /* Màu xanh lá cây */
+  color: #ffffff;
+  border-color: #4caf50;
+}
+
+.error-toast {
+  background-color: #ff4136; /* Màu đỏ */
+  color: #ffffff;
+  border-color: #e53935;
+}
+
+.warning-toast {
+  background-color: #ffdc00; /* Màu vàng */
+  color: #333333;
+  border-color: #fbc02d;
+}
+
+.info-toast {
+  background-color: #2196f3; /* Màu xanh dương */
+  color: #ffffff;
+  border-color: #1976d2;
+}
+
+.toast-close-button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  margin-left: 10px;
+}
+@media print {
+  /* Ẩn header và footer khi in */
+  .header, .footer, .invoice-btn {
+    display: none;
+  }
+
+  /* Thiết lập một số styling cơ bản cho nội dung in */
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Đảm bảo phần hóa đơn chiếm toàn bộ trang khi in */
+  #invoice {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+}

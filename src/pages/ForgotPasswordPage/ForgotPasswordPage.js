@@ -4,36 +4,119 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import Footer from "../../components/layout/Footer";
 import Header from "../../components/layout/Header/Header";
 import api from "../../api/api";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import LoadingPage from "../../components/common/LoadingPage";
+import { showFailedAlert, showSuccessAlert } from "../../utils/toastify";
 
 export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState();
-  const email = useRef();
+  const [serverErrors, setServerErrors] = useState();
+  const [error, setError] = useState(null);
+  const [email, setEmail] = useState("");
+
+  const handleChangeEmail = (event) => {
+    setEmail(event.target.value);
+  };
+
+  useEffect(() => {
+    if (email.trim() !== "") {
+      const errorMessage = isInvalidEmail(email);
+      setError(errorMessage);
+    } else {
+      setError(null);
+    }
+  }, [email]);
 
   const sendForgotPasswordEmail = async (email) => {
-    try {
-      const response = await api.post("forgot-password", {
-        email: email,
-      });
+    if (!error) {
       setLoading(true);
-      if (response.data.status) {
-        toast.success(response.data.message);
+      try {
+        const response = await api.post("forgot-password", {
+          email: email,
+        });
+        setLoading(true);
+        if (response.data.status) {
+          setTimeout(() => {
+            showSuccessAlert(response.data.message);
+          }, 3000);
+          setLoading(false);
+        } else {
+          setTimeout(() => {
+            showFailedAlert(response.data.message);
+          }, 3000);
+
+          setLoading(false);
+        }
+      } catch (error) {
         setLoading(false);
-      } else {
-        toast.error(response.data.message);
-        setLoading(false);
-      }
-    } catch (error) {
-      setLoading(false);
-      if (error.response && error.response.data && error.response.data.errors) {
-        setErrors(error.response.data.errors);
-      } else {
-        toast.error(error.response.data.message);
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.errors
+        ) {
+          setServerErrors(error.response.data.errors);
+        } else {
+          showFailedAlert(error.response.data.message);
+        }
       }
     }
+  };
+
+  const isInvalidEmail = (email) => {
+    const invalidCases = [
+      {
+        regex: /@/,
+        condition: (email) => email.split("@").length !== 2,
+        message: "Email phải chứa đúng một ký tự @",
+      },
+      {
+        regex: /^[^@]+$/,
+        condition: (email) => !/^[^@]+@[^@]+\.[^@]+$/.test(email),
+        message: "Email phải chứa đúng một ký tự @ và có dạng tên@miền",
+      },
+      {
+        regex: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+        condition: (email) =>
+          !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email),
+        message: "Email không hợp lệ.",
+      },
+      {
+        regex: /"/,
+        condition: (email) => {
+          const localPart = email.split("@")[0];
+          return /"/.test(localPart) && !/^"[^"]*"$/.test(localPart);
+        },
+        message: "Email không hợp lệ",
+      },
+      {
+        regex: /\\| /,
+        condition: (email) => {
+          const localPart = email.split("@")[0];
+          return /\\| /.test(localPart) && !/^"[^"]*"$/.test(localPart);
+        },
+        message:
+          "Khoảng trắng, dấu ngoặc kép và dấu gạch chéo phải nằm trong chuỗi ngoặc kép và phải có dấu gạch chéo trước đó",
+      },
+      {
+        regex: /.{65,}@/,
+        condition: (email) => email.split("@")[0].length > 64,
+        message: "Phần local-part không được dài hơn 64 ký tự",
+      },
+      {
+        regex: /_/,
+        condition: (email) => /@.*_/.test(email),
+        message: "Dấu gạch dưới không được phép xuất hiện trong phần miền",
+      },
+    ];
+
+    for (const caseCheck of invalidCases) {
+      if (caseCheck.regex.test(email) && caseCheck.condition(email)) {
+        return caseCheck.message;
+      }
+    }
+
+    return null;
   };
 
   if (loading) {
@@ -48,16 +131,16 @@ export default function ForgotPasswordPage() {
     event.preventDefault();
     console.log(email);
     if (!email) {
-      toast.error(errors.email[0]);
+      showFailedAlert(serverErrors.email[0]);
       return;
     }
-    sendForgotPasswordEmail(email.current.value);
+    sendForgotPasswordEmail(email);
   };
 
   return (
     <>
-      <Header />
       <ToastContainer />
+      <Header />
       <div class="container forms">
         <div className="form show-signup">
           <div className="form-content">
@@ -68,10 +151,14 @@ export default function ForgotPasswordPage() {
                   type="email"
                   placeholder="Email"
                   className="input"
-                  ref={email}
+                  value={email}
+                  onChange={handleChangeEmail}
                 />
               </div>
-
+              {error && <div style={{ color: "red" }}>{error}</div>}
+              {serverErrors && (
+                <div style={{ color: "red" }}>{serverErrors?.email[0]}</div>
+              )}
               <div className="field button-field">
                 <button onClick={handleClick}>Khôi phục</button>
               </div>

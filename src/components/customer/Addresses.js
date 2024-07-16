@@ -6,9 +6,10 @@ import AddressRow from "../address/AddressRow";
 import useAuthContext from "../../context/AuthContext";
 import DefaultAddress from "../address/DefaultAddress";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 import LoadingPage from "../common/LoadingPage";
+import { showFailedAlert, showSuccessAlert } from "../../utils/toastify";
 
 export default function Addresses() {
   const [addresses, setAddresses] = useState();
@@ -21,18 +22,22 @@ export default function Addresses() {
     if (!token) {
       navigator("/login");
       setTimeout(() => {
-        toast.error("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.");
+        showFailedAlert("Vui lòng đăng nhập lại");
       }, 1000);
       return;
     }
 
-    loadAddresses();
-    loadDefaultAddress();
-  }, []);
+   
+  }, [token, navigator]);
 
-  const loadAddresses = async () => {
+  useEffect(()=>{
+    loadAddresses(user?.id);
+    loadDefaultAddress(user?.id);
+  }, [user?.id]);
+
+  const loadAddresses = async (id) => {
     try {
-      const data = await getAddresses(user?.id);
+      const data = await getAddresses(id);
       setAddresses(data.data);
     } catch (error) {
       console.error("Failed to load addresses:", error);
@@ -41,29 +46,25 @@ export default function Addresses() {
     }
   };
 
-  const loadDefaultAddress = async () => {
+  const loadDefaultAddress = async (id) => {
     try {
-      const data = await getDefaultAddress(user?.id);
+      const data = await getDefaultAddress(id);
       setDefaultAddress(data.data);
     } catch (error) {
       console.error("Failed to load addresses:", error);
     }
   };
 
-  const handleReload = (message) => {
-    loadAddresses();
-    loadDefaultAddress();
-    toast.success(message);
+  const handleReload = () => {
+    loadAddresses(user?.id);
+    loadDefaultAddress(user?.id);
   };
 
-  const handleReloadDefaultAddress = (message) => {
-    loadDefaultAddress();
-    toast.success("Đã đặt làm mặc định.");
-  }
-
   const handleReDeleteAddress = () => {
-    toast.success("Đã xóa địa chỉ.");
-  }
+    loadAddresses(user?.id);
+    loadDefaultAddress(user?.id);
+    showSuccessAlert("Đã xóa địa chỉ.");
+  };
 
   if (loading) {
     return <LoadingPage />;
@@ -71,18 +72,7 @@ export default function Addresses() {
 
   return (
     <>
-    <ToastContainer 
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      /> 
+    <ToastContainer/>
       {addresses ? (
         <>
           <div className="page-section mb-60">
@@ -101,7 +91,10 @@ export default function Addresses() {
                       <div className="box-info-account">
                         <div id="address_tables" className="address_table_list">
                           {defaultAddress && (
-                            <DefaultAddress data={defaultAddress} onReload={handleReload}/>
+                            <DefaultAddress
+                              data={defaultAddress}
+                              onReload={handleReload}
+                            />
                           )}
 
                           <div className="address_table">
@@ -111,7 +104,13 @@ export default function Addresses() {
                             >
                               {addresses &&
                                 addresses.map((item) => {
-                                  return <AddressRow data={item} onReload={handleReload} deleteReload={handleReDeleteAddress}/>;
+                                  return (
+                                    <AddressRow
+                                      data={item}
+                                      onReload={handleReload}
+                                      deleteReload={handleReDeleteAddress}
+                                    />
+                                  );
                                 })}
                             </div>
                           </div>

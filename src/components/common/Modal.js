@@ -52,7 +52,7 @@ export default function Modal(props) {
                         <p>Công nghệ CPU:</p>
                       </div>
                       <div className="ctRight">
-                        <span className="">{props.data[0].value}</span>
+                        <span className="">{props.data[0]?.value}</span>
                       </div>
                     </li>
                     <li data-id="28859" data-group-id="32" data-index="4">
@@ -60,7 +60,7 @@ export default function Modal(props) {
                         <p>Số nhân:</p>
                       </div>
                       <div className="ctRight">
-                        <span className=""> {props.data[1].value}</span>
+                        <span className=""> {props.data[1]?.value}</span>
                       </div>
                     </li>
                     <li data-id="28860" data-group-id="32" data-index="5">
@@ -68,7 +68,7 @@ export default function Modal(props) {
                         <p>Số luồng:</p>
                       </div>
                       <div className="ctRight">
-                        <span className=""> {props.data[2].value}</span>
+                        <span className=""> {props.data[2]?.value}</span>
                       </div>
                     </li>
                     <li data-id="93" data-group-id="32" data-index="6">
@@ -76,21 +76,21 @@ export default function Modal(props) {
                         <p>Tốc độ CPU:</p>
                       </div>
                       <div className="ctRight">
-                        <span className=""> {props.data[3].value}</span>
+                        <span className=""> {props.data[3]?.value}</span>
                       </div>
                     </li>
                     <li data-id="97" data-group-id="32" data-index="7">
                       <div className="ctLeft">
                         <p>Tốc độ tối đa:</p>
                       </div>
-                      <div className="ctRight">{props.data[4].value}</div>
+                      <div className="ctRight">{props.data[4]?.value}</div>
                     </li>
                     <li data-id="28861" data-group-id="32" data-index="8">
                       <div className="ctLeft">
                         <p>Bộ nhớ đệm:</p>
                       </div>
                       <div className="ctRight">
-                        <span className=""> {props.data[5].value}</span>
+                        <span className=""> {props.data[5]?.value}</span>
                       </div>
                     </li>
                   </ul>
@@ -108,14 +108,14 @@ export default function Modal(props) {
                       <div className="ctLeft">
                         <p>RAM:</p>
                       </div>
-                      <div className="ctRight">{props.data[6].value}</div>
+                      <div className="ctRight">{props.data[6]?.value}</div>
                     </li>
                     <li data-id="149" data-group-id="34" data-index="2">
                       <div className="ctLeft">
                         <p>Loại RAM:</p>
                       </div>
                       <div className="ctRight">
-                        <span className=""> {props.data[7].value}</span>
+                        <span className=""> {props.data[7]?.value}</span>
                       </div>
                     </li>
                     <li data-id="155" data-group-id="34" data-index="3">
@@ -123,7 +123,7 @@ export default function Modal(props) {
                         <p>Tốc độ Bus RAM:</p>
                       </div>
                       <div className="ctRight">
-                        <span className=""> {props.data[8].value}</span>
+                        <span className=""> {props.data[8]?.value}</span>
                       </div>
                     </li>
                     <li data-id="137" data-group-id="34" data-index="4">
@@ -131,7 +131,7 @@ export default function Modal(props) {
                         <p>Hỗ trợ RAM tối đa:</p>
                       </div>
                       <div className="ctRight">
-                        <span className=""> {props.data[9].value}</span>
+                        <span className=""> {props.data[9]?.value}</span>
                       </div>
                     </li>
                     <li data-id="184" data-group-id="34" data-index="5">
@@ -139,7 +139,7 @@ export default function Modal(props) {
                         <p>Ổ cứng:</p>
                       </div>
                       <div className="ctRight">
-                        <span className=""> {props.data[10].value}</span>
+                        <span className=""> {props.data[10]?.value}</span>
                       </div>
                     </li>
                   </ul>
@@ -158,7 +158,7 @@ export default function Modal(props) {
                         <p>Màn hình:</p>
                       </div>
                       <div className="ctRight">
-                        <span className=""> {props.data[11].value}</span>
+                        <span className=""> {props.data[11]?.value}</span>
                       </div>
                     </li>
                     <li data-id="189" data-group-id="52" data-index="2">
@@ -166,28 +166,28 @@ export default function Modal(props) {
                         <p>Độ phân giải:</p>
                       </div>
                       <div className="ctRight">
-                        <span className="">{props.data[12].value}</span>
+                        <span className="">{props.data[12]?.value}</span>
                       </div>
                     </li>
                     <li data-id="29056" data-group-id="52" data-index="3">
                       <div className="ctLeft">
                         <p>Tần số quét:</p>
                       </div>
-                      <div className="ctRight">{props.data[13].value}</div>
+                      <div className="ctRight">{props.data[13]?.value}</div>
                     </li>
                     <li data-id="41425" data-group-id="52" data-index="4">
                       <div className="ctLeft">
                         <p>Độ phủ màu:</p>
                       </div>
                       <div className="ctRight">
-                        <span className="">{props.data[14].value}</span>
+                        <span className="">{props.data[14]?.value}</span>
                       </div>
                     </li>
                     <li data-id="186" data-group-id="52" data-index="5">
                       <div className="ctLeft">
                         <p>Công nghệ màn hình:</p>
                       </div>
-                      <div className="ctRight">{props.data[15].value}</div>
+                      <div className="ctRight">{props.data[15]?.value}</div>
                     </li>
                   </ul>
                 </div>
@@ -205,14 +205,14 @@ export default function Modal(props) {
                         <p>Card màn hình:</p>
                       </div>
                       <div className="ctRight">
-                        <span className="">{props.data[16].value}</span>
+                        <span className="">{props.data[16]?.value}</span>
                       </div>
                     </li>
                     <li data-id="196" data-group-id="53" data-index="3">
                       <div className="ctLeft">
                         <p>Công nghệ âm thanh:</p>
                       </div>
-                      <div className="ctRight">{props.data[17].value}</div>
+                      <div className="ctRight">{props.data[17]?.value}</div>
                     </li>
                   </ul>
                 </div>
@@ -229,32 +229,32 @@ export default function Modal(props) {
                       <div className="ctLeft">
                         <p>Cổng giao tiếp:</p>
                       </div>
-                      <div className="ctRight">{props.data[18].value}</div>
+                      <div className="ctRight">{props.data[18]?.value}</div>
                     </li>
                     <li data-id="206" data-group-id="56" data-index="4">
                       <div className="ctLeft">
                         <p>Kết nối không dây:</p>
                       </div>
-                      <div className="ctRight">{props.data[19].value}</div>
+                      <div className="ctRight">{props.data[19]?.value}</div>
                     </li>
                     <li data-id="223" data-group-id="56" data-index="7">
                       <div className="ctLeft">
                         <p>Webcam:</p>
                       </div>
-                      <div className="ctRight">{props.data[21].value}</div>
+                      <div className="ctRight">{props.data[21]?.value}</div>
                     </li>
                     <li data-id="201" data-group-id="56" data-index="9">
                       <div className="ctLeft">
                         <p>Tính năng khác:</p>
                       </div>
-                      <div className="ctRight">{props.data[23].value}</div>
+                      <div className="ctRight">{props.data[23]?.value}</div>
                     </li>
                     <li data-id="10741" data-group-id="56" data-index="10">
                       <div className="ctLeft">
                         <p>Đèn bàn phím:</p>
                       </div>
                       <div className="ctRight">
-                        <span className="">{props.data[22].value}</span>
+                        <span className="">{props.data[22]?.value}</span>
                       </div>
                     </li>
                   </ul>
@@ -273,7 +273,7 @@ export default function Modal(props) {
                         <p>Kích thước & khối lượng:</p>
                       </div>
                       <div className="ctRight">
-                        <span className="">{props.data[24].value}</span>
+                        <span className="">{props.data[24]?.value}</span>
                       </div>
                     </li>
                     <li data-id="7903" data-group-id="62" data-index="20">
@@ -281,7 +281,7 @@ export default function Modal(props) {
                         <p>Chất liệu:</p>
                       </div>
                       <div className="ctRight">
-                        <span className="">{props.data[25].value}</span>
+                        <span className="">{props.data[25]?.value}</span>
                       </div>
                     </li>
                   </ul>
@@ -300,7 +300,7 @@ export default function Modal(props) {
                         <p>Thông tin Pin:</p>
                       </div>
                       <div className="ctRight">
-                        <span className=""> {props.data[26].value}</span>
+                        <span className=""> {props.data[26]?.value}</span>
                       </div>
                     </li>
                     <li data-id="40260" data-group-id="60" data-index="3">
@@ -308,14 +308,14 @@ export default function Modal(props) {
                         <p>Công suất bộ sạc:</p>
                       </div>
                       <div className="ctRight">
-                        <span className="">{props.data[27].value}</span>
+                        <span className="">{props.data[27]?.value}</span>
                       </div>
                     </li>
                     <li data-id="8599" data-group-id="60" data-index="4">
                       <div className="ctLeft">
                         <p>Hệ điều hành:</p>
                       </div>
-                      <div className="ctRight">{props.data[28].value}</div>
+                      <div className="ctRight">{props.data[28]?.value}</div>
                     </li>
                     <li data-id="22711" data-group-id="60" data-index="5">
                       <div className="ctLeft">

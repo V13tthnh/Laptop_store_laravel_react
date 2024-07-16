@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faLock,
@@ -8,14 +8,12 @@ import {
   faHeart,
 } from "@fortawesome/free-solid-svg-icons";
 import { faFileInvoice } from "@fortawesome/free-solid-svg-icons";
-import { NavLink, useNavigate } from "react-router-dom";
-import api from "../../../api/api";
-import { ToastContainer, toast } from "react-toastify";
+import { NavLink } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import useAuthContext from "../../../context/AuthContext";
 
 export default function HeaderTop() {
-  const { token, user, getUser, logout } = useAuthContext();
+  const { token, user, logout } = useAuthContext();
 
   useEffect(() => {
     if (token) {
@@ -23,7 +21,8 @@ export default function HeaderTop() {
     }
   }, [token]);
 
-  const logoutHandle = () => {
+  const logoutHandle = (e) => {
+    e.preventDefault();
     logout();
   };
 
