@@ -15,7 +15,7 @@ export default function Footer() {
                       />
                     </div>
                     <div className="shipping-text">
-                      <h2>Miễn phí vận chuyển</h2>
+                      <h2>Vận chuyển nhanh chóng</h2>
                       <p>Hỗ trợ đổi trả miễn phí. Xem thanh toán để biết ngày giao hàng.</p>
                     </div>
                   </div>
@@ -100,7 +100,11 @@ export default function Footer() {
                     </li>
                     <li>
                       <span>SĐT: </span>
-                      <a href="#">(+123) 123 321 345</a>
+                      <a href="#">(+84) 703 169 460</a>
+                    </li>
+                    <li>
+                      <span>SĐT: </span>
+                      <a href="#">(+84) 703 169 460</a>
                     </li>
                     <li>
                       <span>Email: </span>

@@ -1,61 +1,55 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Box, TextField } from "@mui/material";
 import CheckoutProductInfo from "./CheckoutProductInfo";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import AddAddressModal from "./AddAddressModal";
 import AddressRow from "./AddressRow";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faHome } from "@fortawesome/free-solid-svg-icons";
-import { getAllAddresses } from "../../api/address";
+import {
+  getAllAddresses,
+  getDefaultAddress,
+  getProvinceType,
+} from "../../api/address";
 import { useDispatch, useSelector } from "react-redux";
 import { clearCart } from "../../redux/slices/CartSlice";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import useAuthContext from "../../context/AuthContext";
-import api from "../../api/api";
-import LoadingPage from "../common/LoadingPage";
 import { clearCoupon } from "../../redux/slices/CouponSlice";
+import { Skeleton } from "@mui/material";
+import { ColorRing } from "react-loader-spinner";
+import { showFailedAlert, showSuccessAlert } from "../../utils/toastify";
 
 export default function Checkout(props) {
   const dispatch = useDispatch();
   const coupon = useSelector((state) => state.coupon.items);
   const [loading, setLoading] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [selectPayment, setSelectPayment] = useState(null);
   const [selectAddress, setSelectAddress] = useState(null);
   const [addresses, setAddresses] = useState([]);
+  const [provinceType, setProvinceType] = useState([]);
   const { user, token } = useAuthContext();
   const cartItems = useSelector((state) => state.cart.items);
   const cartTotal = useSelector((state) => state.cart.total);
-  const navigator = useNavigate();
+  const [defaultAddress, setDefaultAddress] = useState();
   const [note, setNote] = useState(null);
+  const [vndToDollar, setVndToDollar] = useState(null);
+  const [shippingFee, setShippingFee] = useState(null);
   const params = useLocation();
   const navigate = useNavigate();
 
   const search = new URLSearchParams(params.search);
   const vnp_ResponseCode = search.get("vnp_ResponseCode");
 
-  const loadAddresses = async () => {
-    try {
-      const data = await getAllAddresses(user.id);
-      setAddresses(data.data);
-    } catch (error) {
-      console.error("Failed to load addresses:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
     if (!token) {
       navigate("/login");
       setTimeout(() => {
-        toast.error("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại");
-      }, 1000);
+        showFailedAlert("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại");
+      }, 1200);
       return;
     }
-
-    loadAddresses();
 
     if (vnp_ResponseCode !== null) {
       axios
@@ -72,32 +66,108 @@ export default function Checkout(props) {
         )
         .then((res) => {
           if (res.data.success) {
+            setLoading(true);
             dispatch(clearCart());
             dispatch(clearCoupon());
+            showSuccessAlert("Thanh toán thành công, cảm ơn bạn đã mua hàng.");
             setTimeout(() => {
-              toast.success("Cảm ơn bạn đã mua hàng.");
-              navigator("/account/orders");
-            }, 2000);
+              navigate(`/bill/order/${res.data.order_id}`);
+            }, 1200);
+            setLoading(false);
           } else {
-            navigator("/checkout");
-            toast.error(res.data.message);
+            setLoading(false);
+            navigate("/checkout");
+            showFailedAlert(res.data.message);
           }
         })
-        .catch((error) => console.log(error));
+        .catch((error) => {
+          console.log(error);
+          setLoading(false);
+        });
     }
   }, [token, vnp_ResponseCode]);
 
-  if (!token || !addresses || !user) {
-    return (
-      <>
-        <LoadingPage />
-      </>
-    );
-  }
+  const loadAddresses = async (id) => {
+    try {
+      setLoading(true);
+      const data = await getAllAddresses(id);
+      setAddresses(data.data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Failed to load addresses:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const handleReload = (message) => {
-    loadAddresses();
-    toast.success(message);
+  useEffect(() => {
+    loadAddresses(user?.id);
+    handleGetDefaultAddress(user?.id);
+    handleGetProvinceType(user?.id);
+    let addressObj = {
+      pick_province: defaultAddress?.provinces,
+      pick_district: defaultAddress?.district,
+      province: defaultAddress?.provinces,
+      district: defaultAddress?.district,
+    };
+    shippingFeeCalculator(addressObj);
+  }, [user?.id, defaultAddress?.provinces, defaultAddress?.district]);
+
+  const handleGetDefaultAddress = async (id) => {
+    try {
+      const data = await getDefaultAddress(id);
+      setDefaultAddress(data.data);
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        console.log(error.response.data.errors);
+      } else {
+        console.log({ submit: "Failed to load default address" });
+      }
+    }
+  };
+
+  const shippingFeeCalculator = async (addressObj) => {
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/calculate-shipping-fee",
+        addressObj,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setShippingFee(response.data.data.fee.fee);
+    } catch (error) {
+      console.log("Failed to calculate shipping fee");
+      setShippingFee(null);
+    }
+  };
+
+  const handleGetProvinceType = async (id) => {
+    try {
+      const data = await getProvinceType(id);
+      setProvinceType(data.data);
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        console.log(error.response.data.errors);
+      } else {
+        console.log({ submit: "Failed to load province type address" });
+      }
+    }
+  };
+
+  const handleReload = () => {
+    handleGetProvinceType(user?.id);
+    loadAddresses(user.id);
+    handleGetDefaultAddress(user?.id);
+    let addressObj = {
+      pick_province: defaultAddress?.provinces,
+      pick_district: defaultAddress?.district,
+      province: defaultAddress?.provinces,
+      district: defaultAddress?.district,
+    };
+    shippingFeeCalculator(addressObj);
   };
 
   const handlePaymentVNPayChange = () => {
@@ -117,6 +187,9 @@ export default function Checkout(props) {
   };
 
   const formatCurrency = (total) => {
+    if (total === null || total === undefined) {
+      return "0 vnđ";
+    }
     return total.toLocaleString("vi-VN") + " vnđ";
   };
 
@@ -150,19 +223,21 @@ export default function Checkout(props) {
     }, 0);
   };
 
-  const handleCheckout = (event) => {
-    event.preventDefault();
+  const handleCheckout = async (e) => {
+    e.preventDefault();
     if (selectPayment === null) {
-      toast.error("Bạn chưa chọn hình thức thanh toán.");
+      showFailedAlert("Bạn chưa chọn hình thức thanh toán.");
       return;
     }
+
     const jsonOrders = {
       user_id: user?.id,
       name: user?.full_name,
       phone: user?.phone,
       subtotal: calculateTotal(cartItems),
       discount: coupon ? checkDiscount(coupon.type) : 0,
-      total: cartTotal,
+      coupon_code: coupon?.code,
+      total: cartTotal + shippingFee,
       formality: selectPayment,
       note: note,
       product_id: [],
@@ -170,15 +245,78 @@ export default function Checkout(props) {
       product_price: [],
       product_total: [],
     };
-    if (selectPayment === 1) {
-      VNPPaymentCheckout(jsonOrders);
+
+    console.log(jsonOrders);
+
+    for (let i = 0; i < cartItems.length; i++) {
+      jsonOrders.product_id[i] = cartItems[i].id;
+      jsonOrders.product_quantity[i] = cartItems[i].quantity;
+      jsonOrders.product_price[i] = parseToNumber(cartItems[i].unit_price);
+      jsonOrders.product_total[i] =
+        parseToNumber(cartItems[i].unit_price) * cartItems[i].quantity;
     }
+   
     if (selectPayment === 2) {
-      CODPaymentCheckout(jsonOrders);
+      setCheckoutLoading(true);
+      axios
+        .post("http://127.0.0.1:8000/api/checkout", jsonOrders, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          setCheckoutLoading(false);
+          if (response.data.status) {
+            dispatch(clearCart());
+            dispatch(clearCoupon());
+            showSuccessAlert("Thanh toán thành công, cảm ơn bạn đã mua hàng.");
+            setTimeout(() => {
+              navigate(`/bill/order/${response.data.order_id}`);
+            }, 3000);
+          }
+        })
+        .catch((error) => {
+          setCheckoutLoading(false);
+          if (
+            error.response &&
+            error.response.data &&
+            error.response.data.errors
+          ) {
+            showFailedAlert(error.response.data.errors);
+          } else {
+            showFailedAlert(error.response.data.message);
+          }
+        });
+    } else {
+      setCheckoutLoading(true);
+      axios
+        .post(`http://127.0.0.1:8000/api/checkout-online`, jsonOrders, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          if (response.data.success) {
+            window.location.href = response.data.data;
+            setCheckoutLoading(false);
+          }
+        })
+        .catch((error) => {
+          setCheckoutLoading(false);
+          if (
+            error.response &&
+            error.response.data &&
+            error.response.data.errors
+          ) {
+            showFailedAlert(error.response.data.errors);
+          } else {
+            showFailedAlert(error.response.data.message);
+          }
+        });
     }
   };
 
-  const CODPaymentCheckout = (jsonOrders) => {
+  const CODPaymentCheckout = async (jsonOrders) => {
     for (let i = 0; i < cartItems.length; i++) {
       jsonOrders.product_id[i] = cartItems[i].id;
       jsonOrders.product_quantity[i] = cartItems[i].quantity;
@@ -187,29 +325,36 @@ export default function Checkout(props) {
         parseToNumber(cartItems[i].unit_price) * cartItems[i].quantity;
     }
 
-    api
-      .post("/checkout", jsonOrders, {
+    setCheckoutLoading(true);
+    axios
+      .post("http://127.0.0.1:8000/api/checkout", jsonOrders, {
         headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
           Authorization: `Bearer ${token}`,
         },
       })
       .then((response) => {
-        dispatch(clearCart());
-        dispatch(clearCoupon());
-        setTimeout(() => {
-          toast.success("Cảm ơn bạn đã mua hàng.");
-          navigate("/account/orders");
-        }, 3000);
+        setCheckoutLoading(false);
+        if (response.data.status) {
+          dispatch(clearCart());
+          dispatch(clearCoupon());
+          showSuccessAlert("Thanh toán thành công, cảm ơn bạn đã mua hàng.");
+          setTimeout(() => {
+            navigate("/account/orders");
+          }, 1000);
+        }
       })
       .catch((error) => {
+        setCheckoutLoading(false);
         if (
           error.response &&
           error.response.data &&
           error.response.data.errors
         ) {
-          toast.error(error.response.data.errors);
+          showFailedAlert(error.response.data.errors);
         } else {
-          toast.error(error.response.data.message);
+          showFailedAlert(error.response.data.message);
         }
       });
   };
@@ -222,7 +367,7 @@ export default function Checkout(props) {
       jsonOrders.product_total[i] =
         parseToNumber(cartItems[i].unit_price) * cartItems[i].quantity;
     }
-
+    setCheckoutLoading(true);
     axios
       .post(`http://127.0.0.1:8000/api/checkout-online`, jsonOrders, {
         headers: {
@@ -234,35 +379,43 @@ export default function Checkout(props) {
       .then((response) => {
         if (response.data.success) {
           window.location.href = response.data.data;
+          setCheckoutLoading(false);
         }
       })
       .catch((error) => {
+        setCheckoutLoading(false);
         if (
           error.response &&
           error.response.data &&
           error.response.data.errors
         ) {
-          toast.error(error.response.data.errors);
+          showFailedAlert(error.response.data.errors);
         } else {
-          toast.error(error.response.data.message);
+          showFailedAlert(error.response.data.message);
         }
       });
   };
 
+  const MoMoPaymentCheckout = async (jsonOrders) => {
+    // for (let i = 0; i < cartItems.length; i++) {
+    //   jsonOrders.product_id[i] = cartItems[i].id;
+    //   jsonOrders.product_quantity[i] = cartItems[i].quantity;
+    //   jsonOrders.product_price[i] = parseToNumber(cartItems[i].unit_price);
+    //   jsonOrders.product_total[i] =
+    //     parseToNumber(cartItems[i].unit_price) * cartItems[i].quantity;
+    // }
+    //setCheckoutLoading(true);
+    try {
+      const response = await axios.post("http://127.0.0.1:8000/momo/checkout");
+      const { payUrl } = response.data;
+      window.location.href = payUrl;
+    } catch (error) {
+      console.error("Error during MoMo checkout:", error);
+    }
+  };
+
   return (
     <>
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
       {token && (
         <>
           <div className="container">
@@ -277,7 +430,7 @@ export default function Checkout(props) {
                     </li>
 
                     <li>
-                      <NavLink to={`/laptop`}>Thanh toán</NavLink>
+                      <NavLink to={`/checkout`}>Thanh toán</NavLink>
                     </li>
                   </ul>
                 </div>
@@ -309,9 +462,6 @@ export default function Checkout(props) {
                           }}
                         >
                           <div
-                            data-content-region-name="addressShipping"
-                            data-track-content="true"
-                            data-content-name="addNewAddress"
                             className="teko-col teko-col-6 css-17ajfcv"
                             style={{ paddingLeft: "8px", paddingRight: "8px" }}
                           >
@@ -319,21 +469,62 @@ export default function Checkout(props) {
                           </div>
                         </div>
 
-                        <div
-                          class="teko-col teko-col-6 css-17ajfcv"
-                          style={{ paddingLeft: "8px", paddingRight: "8px" }}
-                        >
-                          {addresses &&
-                            addresses.map((item) => {
-                              return (
-                                <AddressRow
-                                  id={item.id}
-                                  data={item}
-                                  reLoad={handleReload}
-                                />
-                              );
-                            })}
-                        </div>
+                        {loading ? (
+                          <>
+                            <Skeleton
+                              variant="rectangular"
+                              width="100%"
+                              style={{
+                                borderRadius: "4px",
+                                display: "inline-block",
+                                padding: "0.5rem 1.25rem",
+                                position: "relative",
+                                overflow: "hidden",
+                                cursor: "pointer",
+                                width: "100%",
+                              }}
+                              height={100}
+                            />
+                            <Skeleton
+                              variant="rectangular"
+                              width="100%"
+                              style={{
+                                borderRadius: "4px",
+                                display: "inline-block",
+                                padding: "0.5rem 1.25rem",
+                                position: "relative",
+                                overflow: "hidden",
+                                cursor: "pointer",
+                                width: "100%",
+                              }}
+                              height={100}
+                            />
+                            <Skeleton
+                              variant="rectangular"
+                              width="100%"
+                              style={{
+                                borderRadius: "4px",
+                                display: "inline-block",
+                                padding: "0.5rem 1.25rem",
+                                position: "relative",
+                                overflow: "hidden",
+                                cursor: "pointer",
+                                width: "100%",
+                              }}
+                              height={100}
+                            />
+                          </>
+                        ) : (
+                          // Hiển thị danh sách địa chỉ sau khi đã tải thành công
+                          addresses.map((item) => (
+                            <AddressRow
+                              key={item.id}
+                              id={item.id}
+                              data={item}
+                              reLoad={handleReload}
+                            />
+                          ))
+                        )}
                       </div>
                     </div>
                   </div>
@@ -386,6 +577,7 @@ export default function Checkout(props) {
                         rowGap: "16px",
                       }}
                     >
+                      {/* VNPAY */}
                       <div
                         className="teko-col teko-col-6 css-17ajfcv"
                         style={{ paddingLeft: "8px", paddingRight: "8px" }}
@@ -445,6 +637,7 @@ export default function Checkout(props) {
                           )}
                         </div>
                       </div>
+                      {/* COD */}
                       <div
                         className="teko-col teko-col-6 css-17ajfcv"
                         style={{ paddingLeft: "8px", paddingRight: "8px" }}
@@ -492,6 +685,14 @@ export default function Checkout(props) {
                           )}
                         </div>
                       </div>
+
+                      {/* MOMO */}
+                      <div id="paypal-button"></div>
+                      <input
+                        id="vnd_to_dollar"
+                        value={parseFloat((cartTotal / 25410).toFixed(2))}
+                        hidden
+                      />
                     </div>
                   </div>
                 </div>
@@ -512,7 +713,7 @@ export default function Checkout(props) {
                               <tr>
                                 <td color="#848788" className="css-8ogxmh">
                                   <div className="css-99sejg">
-                                    Tổng tạm tính &nbsp;
+                                    Tạm tính &nbsp;
                                     <div className="css-1777v"></div>
                                   </div>
                                 </td>
@@ -527,14 +728,13 @@ export default function Checkout(props) {
                                 <td color="#848788" className="css-13izjcd">
                                   <div className="css-99sejg">
                                     Phí vận chuyển &nbsp;
-                                    <div className="css-1777v"></div>
                                   </div>
                                 </td>
                                 <td
                                   data-att-label="Phí vận chuyển"
                                   className="css-fsu5pb"
                                 >
-                                  Miễn phí
+                                  {formatCurrency(shippingFee)}
                                 </td>
                               </tr>
 
@@ -573,7 +773,10 @@ export default function Checkout(props) {
                                   Thành tiền
                                 </td>
                                 <td className="att-final-price css-aafp0n">
-                                  {formatCurrency(cartTotal)}
+                                  {provinceType[0] === "thanh-pho"
+                                    ? formatCurrency(cartTotal)
+                                    : formatCurrency(cartTotal + shippingFee)}
+                                  {}
                                 </td>
                               </tr>
                             </tbody>
@@ -590,15 +793,35 @@ export default function Checkout(props) {
                           <button
                             className="att-checkout-button css-v463h2"
                             onClick={handleCheckout}
+                            disabled={shippingFee === null || addresses.length === 0}
                           >
-                            <div className="css-1lqe6yk">THANH TOÁN</div>
+                            <div className="css-1lqe6yk">
+                              {checkoutLoading ? (
+                                <ColorRing
+                                  visible={true}
+                                  height="25"
+                                  width="35"
+                                  ariaLabel="color-ring-loading"
+                                  wrapperStyle={{}}
+                                  wrapperClass="color-ring-wrapper"
+                                  colors={[
+                                    "#fff",
+                                    "#fff",
+                                    "#fff",
+                                    "#fff",
+                                    "#fff",
+                                  ]}
+                                />
+                              ) : (
+                                "THANH TOÁN"
+                              )}
+                            </div>
                           </button>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="checkoutInlineRight"></div>
               </div>
             </div>
           </div>

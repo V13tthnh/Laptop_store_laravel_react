@@ -6,10 +6,9 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen } from "@fortawesome/free-solid-svg-icons";
-import { Box, Rating } from "@mui/material";
 import useAuthContext from "../../context/AuthContext";
-import { toast, ToastContainer } from "react-toastify";
 import { storeReview } from "../../api/review";
+import { showFailedAlert, showSuccessAlert } from "../../utils/toastify";
 
 export default function AddReviewModal({ url, id }) {
   const { token, user } = useAuthContext();
@@ -43,7 +42,7 @@ export default function AddReviewModal({ url, id }) {
     try {
       await storeReview(form);
       setForm({ comment: "", rating: null });
-      toast.success(
+      showSuccessAlert(
         "Đánh giá của bạn đã được gửi cho quản trị viên và sẽ được duyệt trong 24 giờ."
       );
       handleClose();
@@ -60,7 +59,7 @@ export default function AddReviewModal({ url, id }) {
 
   const handleClickOpen = () => {
     if (!token) {
-      toast.error("Bạn cần đăng nhập để viết đánh giá.");
+      showFailedAlert("Bạn cần đăng nhập để viết đánh giá.");
       return;
     }
     setOpen(true);
@@ -70,11 +69,8 @@ export default function AddReviewModal({ url, id }) {
     setOpen(false);
   };
 
-
-
   return (
     <>
-      <ToastContainer />
       <Button
         variant="contained"
         onClick={handleClickOpen}

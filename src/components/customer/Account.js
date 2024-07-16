@@ -1,10 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import "../../pages/AccountPage/AccountPage.css";
 import LeftSidebar from "./LeftSidebar";
 import useAuthContext from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import {
   Box,
   FormControlLabel,
@@ -18,13 +16,16 @@ import {
 } from "@mui/material";
 import LoadingPage from "../common/LoadingPage";
 import { updateProfile } from "../../api/customer";
+import { showFailedAlert, showSuccessAlert } from "../../utils/toastify";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Account() {
-  const { token, user } = useAuthContext();
+  const { token, user, getUser } = useAuthContext();
   const navigate = useNavigate();
-  const [date, setDate] = useState(user?.birthday);
+  const [date, setDate] = useState("");
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState([]);
+  const [errors, setErrors] = useState({});
   const [day, setDay] = useState("");
   const [month, setMonth] = useState("");
   const [year, setYear] = useState("");
@@ -42,11 +43,35 @@ export default function Account() {
   };
 
   const handleEmailChange = (event) => {
-    setEmail(event.target.value);
+    const value = event.target.value;
+    setEmail(value);
+    if (!value.endsWith("@gmail.com")) {
+      setErrors((prev) => ({
+        ...prev,
+        email: "Email phải đúng định dạng miền @gmail.com",
+      }));
+    } else {
+      setErrors((prev) => {
+        const { email, ...rest } = prev;
+        return rest;
+      });
+    }
   };
 
   const handlePhoneChange = (event) => {
-    setPhone(event.target.value);
+    const value = event.target.value;
+    setPhone(value);
+    if (!/^0\d{9}$/.test(value)) {
+      setErrors((prev) => ({
+        ...prev,
+        phone: "Số điện thoại phải đủ 10 ký tự và bắt đầu bằng 0",
+      }));
+    } else {
+      setErrors((prev) => {
+        const { phone, ...rest } = prev;
+        return rest;
+      });
+    }
   };
 
   const handleDayChange = (event) => {
@@ -65,25 +90,23 @@ export default function Account() {
     if (!token) {
       navigate("/login");
       setTimeout(() => {
-        toast.error("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại");
+        showFailedAlert("Vui lòng đăng nhập lại");
       }, 1000);
       return;
     }
-    setFullName(user?.full_name);
-    setEmail(user?.email);
-    setPhone(user?.phone);
-    splitDate(user?.birthday);
-  }, [
-    token,
-    user?.full_name,
-    user?.email,
-    user?.phone,
-    user?.birthday,
-    navigate,
-  ]);
+
+    setFullName(user?.full_name || "");
+    setEmail(user?.email || "");
+    setPhone(user?.phone || "");
+    setGender(user?.gender || "");
+    if (user?.birthday) {
+      splitDate(user.birthday);
+    }
+
+  }, [token, user, navigate]);
 
   if (loading) {
-    return <LoadingPage></LoadingPage>;
+    return <LoadingPage />;
   }
 
   const splitDate = (dateString) => {
@@ -113,9 +136,13 @@ export default function Account() {
 
   const submitChange = async (event) => {
     event.preventDefault();
+    if (Object.keys(errors).length > 0) {
+      showFailedAlert("Vui lòng kiểm tra kỹ thông tin.");
+      return;
+    }
     var birthday = `${year}-${month}-${day}`;
     var profileObj = {
-      user_id: user.id,
+      user_id: user?.id,
       full_name: fullName,
       gender: gender,
       phone: phone,
@@ -128,9 +155,14 @@ export default function Account() {
   const handleUpdate = async (profileObj) => {
     try {
       setLoading(true);
-      await updateProfile(profileObj);
-      
+      const response = await updateProfile(profileObj);
+      console.log(response.data);
       setErrors({});
+      await getUser(token);
+      setTimeout(() => {
+        showSuccessAlert("Cập nhật thành công.");
+      }, 1500);
+      setLoading(false);
     } catch (error) {
       if (error.response && error.response.data && error.response.data.errors) {
         setErrors(error.response.data.errors);
@@ -139,24 +171,12 @@ export default function Account() {
       }
     } finally {
       setLoading(false);
-      toast.success("Cập nhật thành công.");
     }
   };
 
   return (
     <>
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
+      <ToastContainer />
       <div className="page-section mb-60">
         <div className="container">
           <section className="wrapper">
@@ -166,6 +186,9 @@ export default function Account() {
                 <h2>Thông tin tài khoản</h2>
                 <div className="profile-area">
                   <div className="box-info-account">
+                    {errors.submit && (
+                      <div className="error">{errors.submit}</div>
+                    )}
                     <form
                       className="form-update"
                       id="customer_update_form"
@@ -196,8 +219,10 @@ export default function Account() {
                                 onChange={handleFullNameChange}
                               />
                             </div>
-                            {errors.phone && (
-                              <p style={{ color: "red" }}>{errors.phone}</p>
+                            {errors.full_name && (
+                              <span className="text-danger">
+                                <small>{errors.full_name}</small>
+                              </span>
                             )}
                           </Box>
                         </div>
@@ -260,7 +285,9 @@ export default function Account() {
                               />
                             </div>
                             {errors.phone && (
-                              <p style={{ color: "red" }}>{errors.phone}</p>
+                              <span className="text-danger">
+                                <small>{errors.phone}</small>
+                              </span>
                             )}
                           </Box>
                         </div>
@@ -295,7 +322,9 @@ export default function Account() {
                               />
                             </div>
                             {errors.email && (
-                              <p style={{ color: "red" }}>{errors.email}</p>
+                              <span className="text-danger">
+                                <small>{errors.email}</small>
+                              </span>
                             )}
                           </Box>
                         </div>

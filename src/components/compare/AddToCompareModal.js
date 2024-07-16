@@ -1,20 +1,17 @@
 import {
-  Button,
   Dialog,
-  DialogActions,
   DialogContent,
   DialogContentText,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
 import { addProductToCompare } from "../../redux/slices/ProductCompareSlice";
 import useDebounce from "../../hooks/debounce";
 import api from "../../api/api";
-import ProductDropdown from "../common/ProductDropdown";
 import SearchProductList from "./SearchProductList";
 import Compare from "../common/Compare";
+import { showSuccessAlert } from "../../utils/toastify";
 
 export default function AddToCompareModal() {
   const [open, setOpen] = useState(false);
@@ -50,13 +47,11 @@ export default function AddToCompareModal() {
 
   const handleAddToCompare = (product) => {
     dispatch(addProductToCompare(product));
-    toast.success("Đã thêm vào mục so sánh.");
+    showSuccessAlert("Đã thêm vào mục so sánh.");
   };
 
   return (
     <>
-      <ToastContainer />
-
       <li className="productid-0" onClick={handleClickOpen}>
         <div className="addsp-cp">
           <div className="plus">

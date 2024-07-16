@@ -1,42 +1,31 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
-import { setDefaultAddress } from "../../api/address";
+import { setDefaultAddress, getDefaultAddress } from "../../api/address";
 import useAuthContext from "../../context/AuthContext";
-import { ToastContainer } from "react-toastify";
+import { showSuccessAlert } from "../../utils/toastify";
 
 export default function AddressRow({ id, data, reLoad }) {
-  const {user} = useAuthContext();
+  const { user } = useAuthContext();
   const [errors, setErrors] = useState([]);
 
   const handleSetDefaultAddress = async () => {
     try {
-      await setDefaultAddress(user?.id, {id: data.id});
-      reLoad("Đã đặt làm mặc định.");
+      await setDefaultAddress(user?.id, { id: data.id });
+      reLoad();
+      showSuccessAlert("Đã đặt làm mặc định.");
     } catch (error) {
       if (error.response && error.response.data && error.response.data.errors) {
         setErrors(error.response.data.errors);
-       
       } else {
         setErrors({ submit: "Failed to add address" });
       }
     }
-  }
+  };
+
 
   return (
     <>
-    <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
       {/* {".css-64rk53 - ko  viền, css-1014eaz - viền xanh "} */}
       <div
         data-content-region-name="shippingAddress"
@@ -44,15 +33,13 @@ export default function AddressRow({ id, data, reLoad }) {
         data-content-name="homeDelivery"
         data-content-index="0"
         data-content-target="79"
-        class={
-          data.is_default ? "css-1014eaz selected" : "css-64rk53"
-        }
+        class={data.is_default ? "css-1014eaz selected" : "css-64rk53"}
         style={{ height: "100%" }}
         onClick={handleSetDefaultAddress}
       >
         <div>
           <span style={{ fontWeight: "bold", marginRight: "2px" }}>
-          {data.full_name}
+            {data.full_name}
           </span>
           <div
             data-content-region-name="shippingAddress"

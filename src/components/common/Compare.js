@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { addProductToCompare } from "../../redux/slices/ProductCompareSlice";
-import { toast, ToastContainer } from "react-toastify";
+import { showFailedAlert, showSuccessAlert } from "../../utils/toastify";
 
 export default function Compare(props) {
   const dispatch = useDispatch();
@@ -12,12 +12,12 @@ export default function Compare(props) {
   const handleAddToCompare = (product) => {
     if(products){
       if(products.length > 3){
-        toast.error("Chỉ được so sánh tối đa 3 sản phẩm.");
+        showFailedAlert("Chỉ được so sánh tối đa 3 sản phẩm.");
         return;
       }
     }
     dispatch(addProductToCompare(product));
-    toast.success("Đã thêm vào so sánh.")
+    showSuccessAlert("Đã thêm vào so sánh.")
   };
 
   return (

@@ -18,7 +18,8 @@ import {
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const formatCurrency = (value) => {
   return new Intl.NumberFormat("vi-VN", {
@@ -56,6 +57,8 @@ export default function FilterPage() {
     limit: 6,
   });
 
+  console.log(filters);
+
   const handlePriceChange = (event, newValue) => {
     setFilters({
       ...filters,
@@ -65,11 +68,19 @@ export default function FilterPage() {
   };
 
   const handleSortChange = (event, value) => {
-    setSelectedSort(value);
-    setFilters({
-      ...filters,
-      sort_by: value,
-    });
+    if (selectedSort === value) {
+      setSelectedSort(null); // Bỏ chọn sort nếu đã được chọn trước đó
+      setFilters({
+        ...filters,
+        sort_by: null, // Cập nhật filter về null để không áp dụng sort
+      });
+    } else {
+      setSelectedSort(value); // Chọn sort nếu chưa được chọn trước đó
+      setFilters({
+        ...filters,
+        sort_by: value,
+      });
+    }
   };
 
   useEffect(() => {
@@ -174,8 +185,8 @@ export default function FilterPage() {
 
   return (
     <>
+    <ToastContainer/>
       <Header />
-      <ToastContainer />
       <div className="breadcrumb-area">
         <div className="container">
           <div className="breadcrumb-content">
@@ -196,7 +207,6 @@ export default function FilterPage() {
           </div>
         </div>
       </div>
-
       <div className="content-wraper pt-20 pb-60 pt-sm-30">
         <div className="container">
           <div className="row">
@@ -777,7 +787,7 @@ export default function FilterPage() {
                             }
                             value="18 GB"
                             name="ram"
-                            checked={filters.cpu.includes("18 GB")}
+                            checked={filters.ram.includes("18 GB")}
                             onChange={handleFilterChange}
                             sx={{ "& .MuiSvgIcon-root": { fontSize: 21 } }}
                             size="small"

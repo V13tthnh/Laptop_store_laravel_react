@@ -24,7 +24,6 @@ export default function OrderDeleteModal({ total }) {
 
   return (
     <>
-      <ToastContainer />
       <Button size="small" variant="outlined">
         Hủy đơn
       </Button>

@@ -6,9 +6,7 @@ import {
   DialogContent,
   DialogContentText,
   Box,
-  Checkbox,
   FormControl,
-  FormControlLabel,
   InputLabel,
   MenuItem,
   Select,
@@ -21,9 +19,8 @@ import {
   getWardsByDistrictsId,
   getProvinces,
 } from "../../api/address";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import useAuthContext from "../../context/AuthContext";
+import { showFailedAlert, showSuccessAlert } from "../../utils/toastify";
 
 export default function ModalAddAddress({ onAddSuccess }) {
   const [open, setOpen] = useState(false);
@@ -39,6 +36,7 @@ export default function ModalAddAddress({ onAddSuccess }) {
   const [phone, setPhone] = useState("");
   const [addressDetail, setAddressDetail] = useState("");
   const [errors, setErrors] = useState("");
+  const [phoneError, setPhoneError] = useState("");
   const { user } = useAuthContext();
 
   useEffect(() => {
@@ -83,16 +81,32 @@ export default function ModalAddAddress({ onAddSuccess }) {
     setProvincesId(event.target.value);
   };
 
-  const handlePhoneChange = (event) => {
-    setPhone(event.target.value);
+  const handlePhoneChange = (e) => {
+    let value = e.target.value;
+    value = value.replace(/\D/g, "");
+
+    if (value.trim() === "") {
+      setPhoneError("");
+    } else if (!/^0[0-9]{0,9}$/.test(value)) {
+      setPhoneError(
+        "Số điện thoại không hợp lệ (bắt đầu bằng 0 và gồm từ 1 đến 10 số)"
+      );
+    } else {
+      setPhoneError("");
+    }
+
+    setPhone(value);
   };
 
-  const handleFullNameChange = (event) => {
-    setFullName(event.target.value);
+  const handleFullNameChange = (e) => {
+    let value = e.target.value;
+
+    setFullName(value);
   };
 
-  const handleAddressDetailChange = (event) => {
-    setAddressDetail(event.target.value);
+  const handleAddressDetailChange = (e) => {
+    let value = e.target.value;
+    setAddressDetail(value);
   };
 
   const handleDistrictsChange = (event) => {
@@ -124,6 +138,10 @@ export default function ModalAddAddress({ onAddSuccess }) {
   };
 
   const handleAddAddress = async () => {
+    if (phoneError) {
+      showFailedAlert("Vui lòng nhập thông tin đúng định dạng.");
+      return;
+    }
     let newAddress = {
       full_name: fullName,
       phone: phone,
@@ -138,7 +156,8 @@ export default function ModalAddAddress({ onAddSuccess }) {
 
       resetForm();
       setOpen(false);
-      onAddSuccess("Thêm địa chỉ thành công.");
+      showSuccessAlert("Thêm địa chỉ mới thành công.");
+      onAddSuccess();
     } catch (error) {
       if (error.response && error.response.data && error.response.data.errors) {
         setErrors(error.response.data.errors);
@@ -150,18 +169,6 @@ export default function ModalAddAddress({ onAddSuccess }) {
 
   return (
     <>
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
       <Button onClick={handleClickOpen} className="button add-new-address">
         + Thêm địa chỉ mới
       </Button>
@@ -218,14 +225,21 @@ export default function ModalAddAddress({ onAddSuccess }) {
                       >
                         <div>
                           <TextField
+                            type="number"
                             id="outlined-multiline-flexible"
                             label="Số điện thoại"
                             maxRows={12}
                             onChange={handlePhoneChange}
                           />
                         </div>
-                        {errors.phone && (
+                        {errors.phone ? (
                           <p style={{ color: "red" }}>{errors.phone}</p>
+                        ) : (
+                          phoneError && (
+                            <span style={{ color: "red", marginLeft: "10px" }}>
+                              {phoneError}
+                            </span>
+                          )
                         )}
                       </Box>
                     </div>
@@ -256,7 +270,7 @@ export default function ModalAddAddress({ onAddSuccess }) {
                                     key={province.id}
                                     value={province.id}
                                   >
-                                    {province.name}
+                                    {province.name_with_type}
                                   </MenuItem>
                                 ))}
                             </Select>
@@ -289,7 +303,7 @@ export default function ModalAddAddress({ onAddSuccess }) {
                                     key={district.id}
                                     value={district.id}
                                   >
-                                    {district.name}
+                                    {district.name_with_type}
                                   </MenuItem>
                                 ))}
                             </Select>
@@ -321,7 +335,7 @@ export default function ModalAddAddress({ onAddSuccess }) {
                               {wardData &&
                                 wardData.map((ward) => (
                                   <MenuItem key={ward.id} value={ward.id}>
-                                    {ward.name}
+                                    {ward.name_with_type}
                                   </MenuItem>
                                 ))}
                             </Select>

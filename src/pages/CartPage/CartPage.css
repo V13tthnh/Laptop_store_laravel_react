@@ -2238,3 +2238,14 @@ button:not(:disabled), [type='button']:not(:disabled), [type='reset']:not(:disab
     transition-duration: 80ms;
     transition-property: background-color;
 }
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}

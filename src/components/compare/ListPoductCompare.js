@@ -6,7 +6,6 @@ import { useDispatch } from "react-redux";
 import { NavLink } from "react-router-dom";
 import { removeProductFromCompare } from "../../redux/slices/ProductCompareSlice";
 import AddToCompareModal from "./AddToCompareModal";
-import { ToastContainer } from "react-toastify";
 export default function ListProductCompare({
   data,
   showDifferencesOnChange,
@@ -21,7 +20,6 @@ export default function ListProductCompare({
 
   return (
     <>
-      <ToastContainer />
       <ul className="listproduct pro-compare pro-compare_main">
         <li>
           <p className="title-cp">So sánh sản phẩm</p>

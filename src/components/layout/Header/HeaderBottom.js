@@ -43,7 +43,7 @@ export default function HeaderBottom() {
                       <NavLink to="/laptop">
                         <FontAwesomeIcon icon={faLaptop} size="lg" /> Laptop
                       </NavLink>
-                      <ul className="megamenu hb-megamenu">
+                      {/* <ul className="megamenu hb-megamenu">
                         {categoryData &&
                           categoryData.map((item) => {
                             return (
@@ -69,14 +69,14 @@ export default function HeaderBottom() {
                               </>
                             );
                           })}
-                      </ul>
+                      </ul> */}
                     </li>
                     <li className="megamenu-holder">
                       <NavLink to="/laptop">
                         <FontAwesomeIcon icon={faGamepad} size="lg" /> Laptop
                         Gaming
                       </NavLink>
-                      <ul className="megamenu hb-megamenu">
+                      {/* <ul className="megamenu hb-megamenu">
                         {categoryData &&
                           categoryData.map((item) => {
                             return (
@@ -102,7 +102,7 @@ export default function HeaderBottom() {
                               </>
                             );
                           })}
-                      </ul>
+                      </ul> */}
                     </li>
                     {/* <li>
                       <a href="shop-left-sidebar.html">

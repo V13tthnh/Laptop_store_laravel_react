@@ -12,11 +12,11 @@ import { useEffect, useRef, useState } from "react";
 import CouponItem from "./CouponItem";
 import useAuthContext from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getAvailableCoupons, getApplyCoupon } from "../../api/coupon";
 import { useDispatch, useSelector } from "react-redux";
 import { applyCoupon } from "../../redux/slices/CouponSlice";
+import { showFailedAlert, showSuccessAlert } from "../../utils/toastify";
 
 export default function CouponModal({ total }) {
   const { token, user } = useAuthContext();
@@ -35,13 +35,14 @@ export default function CouponModal({ total }) {
   };
 
   useEffect(() => {
-    fetchAvailableCoupons();
+    let objRequest = { total: total, user_id: user?.id };
+    fetchAvailableCoupons(objRequest);
     calculateTotal(cartItems);
-  }, [cartItems]);
+  }, [cartItems, total, user?.id]);
 
   const handleClickOpen = () => {
     if (!token || !user) {
-      toast.error("Bạn cần đăng nhập để thực hiện chức năng này.");
+      showFailedAlert("vui lòng đăng nhập lại.");
       navigate("/login");
       return;
     }
@@ -71,9 +72,9 @@ export default function CouponModal({ total }) {
     setOpen(false);
   };
 
-  const fetchAvailableCoupons = async () => {
+  const fetchAvailableCoupons = async (objRequest) => {
     try {
-      const data = await getAvailableCoupons({ total: total });
+      const data = await getAvailableCoupons(objRequest);
       setCoupons(data.data);
     } catch (error) {
       console.error("Failed to load addresses:", error);
@@ -84,21 +85,29 @@ export default function CouponModal({ total }) {
 
   const handleApplyCoupon = async () => {
     try {
-      const response = await getApplyCoupon({ code: applyCode });
-
-      dispatch(
-        applyCoupon({
-          code: response.data.code,
-          value: response.data.value,
-          description: response.data.description,
-          minimum_spend: response.data.minimum_spend,
-          end_date: response.data.end_date,
-          type: response.data.type,
-        })
-      );
-      toast.success("Đã áp dụng mã giảm giá.");
-      handleClose();
-      setApplyCode("");
+      const response = await getApplyCoupon({
+        code: applyCode,
+        total: total,
+        user_id: user?.id,
+      });
+      console.log(response.status);
+      if (response.status) {
+        dispatch(
+          applyCoupon({
+            code: response.data.code,
+            value: response.data.value,
+            description: response.data.description,
+            minimum_spend: response.data.minimum_spend,
+            end_date: response.data.end_date,
+            type: response.data.type,
+          })
+        );
+        showSuccessAlert("Đã áp dụng mã giảm giá.");
+        handleClose();
+        setApplyCode("");
+      } else {
+        showFailedAlert(response.message);
+      }
     } catch (error) {
       if (error.response && error.response.data && error.response.data.errors) {
         setErrors(error.response.data.errors);
@@ -108,11 +117,12 @@ export default function CouponModal({ total }) {
     }
   };
 
+  console.log(coupons);
+
   return (
     <>
-      <ToastContainer />
       <Button onClick={handleClickOpen} size="small">
-        Chọn hoặc nhập khuyến mãi
+        Chọn hoặc nhập mã
       </Button>
       <Dialog open={open} onClose={handleClose} maxWidth="sm">
         <DialogContent>
@@ -120,7 +130,7 @@ export default function CouponModal({ total }) {
             <div className="teko-modal-content">
               <div className="teko-modal-header">
                 <div type="title" className="teko-modal-title css-1cp1h79">
-                  Khuyến mãi và mã giảm giá
+                  Mã giảm giá
                 </div>
               </div>
               <div className="teko-modal-body">
@@ -165,12 +175,23 @@ export default function CouponModal({ total }) {
                     <div type="subtitle" color="black" className="css-1j2lgm2">
                       Mã giảm giá
                     </div>
-                    {coupons &&
+                    {Array.isArray(coupons) ? (
                       coupons.map((item) => {
                         return (
-                          <CouponItem data={item} closeModal={handleClose} />
+                          <CouponItem
+                            key={item.id}
+                            data={item}
+                            closeModal={handleClose}
+                          />
                         );
-                      })}
+                      })
+                    ) : (
+                      <CouponItem
+                        key={coupons.id}
+                        data={coupons}
+                        closeModal={handleClose}
+                      />
+                    )}
                     <div className="css-apomyl"></div>
                   </div>
                 </div>

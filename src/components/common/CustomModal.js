@@ -20,16 +20,6 @@ export default function CustomModal({ isOpen, onClose, children }) {
   if (!isOpen) return null;
 
   return (
-    // <div className="modal">
-    //   <div className="modal-content">
-    //     <div className="modal-header">Đăng ký</div>
-    //     <div className="modal-body"></div>
-    //     <span className="close" onClick={onClose}>
-    //       &times;
-    //     </span>
-    //     {children}
-    //   </div>
-    // </div>
     <div
       className="modal fade modal-account show"
       id="modal-account"

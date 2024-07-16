@@ -20,7 +20,7 @@ import {
   getProvinces,
 } from "../../api/address";
 import useAuthContext from "../../context/AuthContext";
-import { ToastContainer } from "react-toastify";
+import { showFailedAlert, showSuccessAlert } from "../../utils/toastify";
 
 export default function AddAddressModal({ onAddSuccess }) {
   const [open, setOpen] = useState(false);
@@ -37,6 +37,9 @@ export default function AddAddressModal({ onAddSuccess }) {
   const [addressDetail, setAddressDetail] = useState("");
   const [errors, setErrors] = useState("");
   const [error, setError] = useState("");
+  const [fullNameError, setFullNameError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+  const [isValid, setIsValid] = useState(true);
   const { user } = useAuthContext();
 
   useEffect(() => {
@@ -81,27 +84,22 @@ export default function AddAddressModal({ onAddSuccess }) {
     setProvincesId(event.target.value);
   };
 
-  const handlePhoneChange = (event) => {
-    const value = event.target.value;
-    setPhone(value);
-    if (!validatePhone(value)) {
-      setError("Số điện thoại không hợp lệ");
-    } else {
-      setError("");
-    }
-  };
-
-  const handleBlur = (e) => {
+  const handlePhoneChange = (e) => {
     const value = e.target.value;
-    if (!validatePhone(value)) {
-      setError("Số điện thoại gồm 10 số và bắt đầu bằng 0.");
+    if (value.trim() === "") {
+      setPhoneError("");
+    } else if (!/^0[0-9]{9}$/.test(value)) {
+      setPhoneError("Số điện thoại không hợp lệ (bắt đầu bằng 0 và gồm 10 số)");
     } else {
-      setError("");
+      setPhoneError("");
     }
+    setPhone(value);
   };
 
-  const handleFullNameChange = (event) => {
-    setFullName(event.target.value);
+  const handleFullNameChange = (e) => {
+    const value = e.target.value;
+
+    setFullName(value);
   };
 
   const handleAddressDetailChange = (event) => {
@@ -133,63 +131,43 @@ export default function AddAddressModal({ onAddSuccess }) {
     setFullName("");
     setPhone("");
     setAddressDetail("");
-    setErrors({});
+    setError("");
     setError("");
   };
 
   const handleAddAddress = async () => {
-    if (validatePhone(phone)) {
-      setError("");
-      let newAddress = {
-        full_name: fullName,
-        phone: phone,
-        provinces: provinces,
-        district: districts,
-        address_detail: addressDetail,
-        ward: wards,
-        user_id: user?.id,
-      };
-      try {
-        await createAddress(newAddress);
-
-        resetForm();
-        setOpen(false);
-        onAddSuccess("Thêm địa chỉ thành công.");
-      } catch (error) {
-        if (
-          error.response &&
-          error.response.data &&
-          error.response.data.errors
-        ) {
-          setErrors(error.response.data.errors);
-        } else {
-          setErrors({ submit: "Failed to add address" });
-        }
-      }
-    } else {
-      setError("Số điện thoại không hợp lệ");
+    if (fullNameError || phoneError) {
+      showFailedAlert("Vui lòng nhập thông tin đúng định dạng.");
+      return;
     }
-  };
 
-  const validatePhone = (phone) => {
-    const phoneRegex = /^[0-9]{10}$/;
-    return phoneRegex.test(phone);
+    setError("");
+    let newAddress = {
+      full_name: fullName,
+      phone: phone,
+      provinces: provinces,
+      district: districts,
+      address_detail: addressDetail,
+      ward: wards,
+      user_id: user?.id,
+    };
+    try {
+      await createAddress(newAddress);
+      resetForm();
+      setOpen(false);
+      onAddSuccess();
+      showSuccessAlert("Thêm địa chỉ thành công.");
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        setErrors(error.response.data.errors);
+      } else {
+        setErrors({ submit: "Thêm địa chỉ thất bại." });
+      }
+    }
   };
 
   return (
     <>
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
       <Button
         onClick={handleClickOpen}
         height="2.5rem"
@@ -281,13 +259,20 @@ export default function AddAddressModal({ onAddSuccess }) {
                             label="Số điện thoại"
                             maxRows={12}
                             onChange={handlePhoneChange}
-                            onBlur={handleBlur}
                           />
                         </div>
-                        {errors.phone && (
-                          <p style={{ color: "red" }}>{errors.phone}</p>
+
+                        {errors.phone ? (
+                          <span style={{ color: "red", marginLeft: "10px" }}>
+                            {errors.full_name}
+                          </span>
+                        ) : (
+                          phoneError && (
+                            <span style={{ color: "red", marginLeft: "10px" }}>
+                              {phoneError}
+                            </span>
+                          )
                         )}
-                        {error && <p style={{ color: "red" }}>{error}</p>}
                       </Box>
                     </div>
                     <h5>Địa chỉ</h5>
@@ -317,7 +302,7 @@ export default function AddAddressModal({ onAddSuccess }) {
                                     key={province.id}
                                     value={province.id}
                                   >
-                                    {province.name}
+                                    {province.name_with_type}
                                   </MenuItem>
                                 ))}
                             </Select>
@@ -350,7 +335,7 @@ export default function AddAddressModal({ onAddSuccess }) {
                                     key={district.id}
                                     value={district.id}
                                   >
-                                    {district.name}
+                                    {district.name_with_type}
                                   </MenuItem>
                                 ))}
                             </Select>
@@ -382,7 +367,7 @@ export default function AddAddressModal({ onAddSuccess }) {
                               {wardData &&
                                 wardData.map((ward) => (
                                   <MenuItem key={ward.id} value={ward.id}>
-                                    {ward.name}
+                                    {ward.name_with_type}
                                   </MenuItem>
                                 ))}
                             </Select>
